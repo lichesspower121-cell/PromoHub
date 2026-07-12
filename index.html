@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -11,50 +12,41 @@
 
     <meta
         name="theme-color"
-        content="#080b14"
+        content="#070910"
     >
 
     <title>PromoHub</title>
 
+    <script src="https://telegram.org/js/telegram-web-app.js?62"></script>
+
     <link
         rel="stylesheet"
-        href="style.css"
+        href="./style.css"
     >
-
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
-
 
 <body>
 
+    <!-- LOADER -->
 
-    <!-- =========================
-         LOADING SCREEN
-    ========================== -->
-
-    <div id="loader" class="loader-screen">
+    <div
+        id="loader"
+        class="loader-screen"
+    >
 
         <div class="loader-content">
 
             <div class="loader-logo">
 
-                <div class="logo-glow"></div>
+                🚀
 
-                <span>
-                    🚀
-                </span>
+                <div class="logo-glow"></div>
 
             </div>
 
+            <h1>PromoHub</h1>
 
-            <h1>
-                PromoHub
-            </h1>
-
-            <p>
-                Grow your Telegram community
-            </p>
-
+            <p>Promotion made simple.</p>
 
             <div class="spinner">
 
@@ -62,12 +54,11 @@
 
             </div>
 
-
             <span
                 id="loadingText"
                 class="loading-text"
             >
-                Connecting to Telegram...
+                Starting PromoHub...
             </span>
 
         </div>
@@ -75,24 +66,15 @@
     </div>
 
 
+    <!-- LOGIN -->
 
-    <!-- =========================
-         LOGIN
-    ========================== -->
-
-    <section
+    <main
         id="loginPage"
         class="login-page hidden"
     >
 
-        <div class="login-background">
-
-            <div class="orb orb-one"></div>
-
-            <div class="orb orb-two"></div>
-
-        </div>
-
+        <div class="orb orb-one"></div>
+        <div class="orb orb-two"></div>
 
         <div class="login-content">
 
@@ -100,29 +82,23 @@
                 🚀
             </div>
 
-
             <div class="brand">
 
-                <span>
-                    PROMOHUB
-                </span>
+                <span>TELEGRAM PROMOTION</span>
 
                 <h1>
-                    Promote.
-                    <br>
-                    Reach.
-                    <br>
-                    <strong>Grow.</strong>
+                    Promo<strong>Hub.</strong>
                 </h1>
 
             </div>
 
-
             <p class="login-description">
-                The smarter way to promote your
-                Telegram community and track your growth.
-            </p>
 
+                Promote your Telegram links,
+                groups and communities from one
+                powerful dashboard.
+
+            </p>
 
             <button
                 id="loginButton"
@@ -139,20 +115,19 @@
 
             </button>
 
-
             <p class="secure-text">
-                🔒 Secure Telegram authentication
+
+                🔒 Open inside Telegram to connect
+                your account.
+
             </p>
 
         </div>
 
-    </section>
+    </main>
 
 
-
-    <!-- =========================
-         MAIN APP
-    ========================== -->
+    <!-- APP -->
 
     <main
         id="app"
@@ -160,13 +135,11 @@
     >
 
 
-        <!-- =========================
-             DASHBOARD
-        ========================== -->
+        <!-- DASHBOARD -->
 
         <section
             id="dashboardPage"
-            class="page active-page"
+            class="page"
         >
 
             <header class="app-header">
@@ -183,11 +156,11 @@
 
                 </div>
 
-
                 <button
                     id="profileButton"
                     class="user-avatar"
                 >
+
                     👤
 
                     <span class="online-dot"></span>
@@ -197,13 +170,9 @@
             </header>
 
 
-
-            <!-- BALANCE CARD -->
-
             <div class="balance-card">
 
                 <div class="card-glow"></div>
-
 
                 <div class="balance-top">
 
@@ -211,51 +180,47 @@
                         PROMOTION CREDITS
                     </span>
 
-                    <span class="credit-icon">
+                    <span>
                         ⚡
                     </span>
 
                 </div>
 
-
-                <h1 id="userBalance">
-                    0
+                <h1 id="creditBalance">
+                    100
                 </h1>
-
 
                 <p>
                     Available credits
                 </p>
 
-
                 <button
                     id="startPromotionButton"
                     class="card-button"
                 >
-                    Start Promotion
+
+                    <span>
+                        Start Promotion
+                    </span>
 
                     <span>
                         →
                     </span>
+
                 </button>
 
             </div>
 
-
-
-            <!-- STATS -->
 
             <div class="stats-grid">
 
                 <div class="stat-card">
 
                     <div class="stat-icon">
-                        🚀
+                        📢
                     </div>
 
-                    <span>
-                        CAMPAIGNS
-                    </span>
+                    <span>CAMPAIGNS</span>
 
                     <h2 id="campaignCount">
                         0
@@ -271,19 +236,17 @@
                 <div class="stat-card">
 
                     <div class="stat-icon">
-                        👥
+                        📈
                     </div>
 
-                    <span>
-                        TOTAL REACH
-                    </span>
+                    <span>TOTAL REACH</span>
 
                     <h2 id="totalReach">
                         0
                     </h2>
 
                     <small>
-                        People reached
+                        Links delivered
                     </small>
 
                 </div>
@@ -291,19 +254,14 @@
             </div>
 
 
-
-            <!-- QUICK ACTION -->
-
             <div class="section-title">
 
                 <div>
 
-                    <span>
-                        QUICK ACTION
-                    </span>
+                    <span>QUICK ACTION</span>
 
                     <h3>
-                        Start growing
+                        Promote a link
                     </h3>
 
                 </div>
@@ -312,27 +270,25 @@
 
 
             <button
-                class="promote-action"
                 id="quickPromoteButton"
+                class="promote-action"
             >
 
                 <div class="action-icon">
-                    📢
+                    🚀
                 </div>
-
 
                 <div class="action-text">
 
                     <strong>
-                        Promote a Community
+                        New Promotion
                     </strong>
 
                     <span>
-                        Submit your Telegram link
+                        Create a new campaign
                     </span>
 
                 </div>
-
 
                 <span class="action-arrow">
                     →
@@ -341,16 +297,11 @@
             </button>
 
 
-
-            <!-- RECENT CAMPAIGNS -->
-
             <div class="section-title">
 
                 <div>
 
-                    <span>
-                        ACTIVITY
-                    </span>
+                    <span>ACTIVITY</span>
 
                     <h3>
                         Recent Campaigns
@@ -358,10 +309,7 @@
 
                 </div>
 
-
-                <button
-                    id="viewCampaignsButton"
-                >
+                <button id="viewCampaignsButton">
                     View all
                 </button>
 
@@ -370,30 +318,13 @@
 
             <div
                 id="recentCampaigns"
-                class="empty-card"
-            >
-
-                <div class="empty-icon">
-                    📭
-                </div>
-
-                <strong>
-                    No campaigns yet
-                </strong>
-
-                <span>
-                    Start your first promotion campaign
-                </span>
-
-            </div>
+                class="campaign-container"
+            ></div>
 
         </section>
 
 
-
-        <!-- =========================
-             PROMOTE PAGE
-        ========================== -->
+        <!-- PROMOTE PAGE -->
 
         <section
             id="promotePage"
@@ -402,16 +333,14 @@
 
             <div class="page-heading">
 
-                <span>
-                    NEW CAMPAIGN
-                </span>
+                <span>NEW CAMPAIGN</span>
 
                 <h1>
-                    Create Promotion
+                    Promote.
                 </h1>
 
                 <p>
-                    Choose how you want to grow.
+                    Create your Telegram promotion campaign.
                 </p>
 
             </div>
@@ -423,21 +352,17 @@
                     TELEGRAM LINK
                 </label>
 
-
                 <div class="input-box">
 
-                    <span>
-                        🔗
-                    </span>
+                    <span>🔗</span>
 
                     <input
                         id="promotionLink"
                         type="url"
-                        placeholder="https://t.me/yourcommunity"
+                        placeholder="https://t.me/yourgroup"
                     >
 
                 </div>
-
 
 
                 <label>
@@ -461,7 +386,7 @@
                         </strong>
 
                         <small>
-                            Promote your link
+                            Share your Telegram link
                         </small>
 
                     </button>
@@ -477,11 +402,11 @@
                         </span>
 
                         <strong>
-                            Verified Joins
+                            Group Promotion
                         </strong>
 
                         <small>
-                            Track real joins
+                            Promote your community
                         </small>
 
                     </button>
@@ -489,30 +414,30 @@
                 </div>
 
 
-
                 <label>
                     TARGET AMOUNT
                 </label>
 
-
                 <div class="input-box">
 
-                    <span>
-                        🎯
-                    </span>
+                    <span>🎯</span>
 
                     <select id="promotionAmount">
 
+                        <option value="10">
+                            10 Reach
+                        </option>
+
+                        <option value="25">
+                            25 Reach
+                        </option>
+
+                        <option value="50">
+                            50 Reach
+                        </option>
+
                         <option value="100">
                             100 Reach
-                        </option>
-
-                        <option value="500">
-                            500 Reach
-                        </option>
-
-                        <option value="1000">
-                            1,000 Reach
                         </option>
 
                     </select>
@@ -524,11 +449,15 @@
                     id="createCampaignButton"
                     class="main-button"
                 >
-                    Create Campaign
 
                     <span>
-                        →
+                        Create Campaign
                     </span>
+
+                    <span>
+                        🚀
+                    </span>
+
                 </button>
 
             </div>
@@ -536,10 +465,7 @@
         </section>
 
 
-
-        <!-- =========================
-             CAMPAIGNS
-        ========================== -->
+        <!-- CAMPAIGNS -->
 
         <section
             id="campaignsPage"
@@ -548,12 +474,10 @@
 
             <div class="page-heading">
 
-                <span>
-                    YOUR ACTIVITY
-                </span>
+                <span>YOUR ACTIVITY</span>
 
                 <h1>
-                    Campaigns
+                    Campaigns.
                 </h1>
 
                 <p>
@@ -562,33 +486,15 @@
 
             </div>
 
-
             <div
                 id="campaignList"
-                class="empty-card"
-            >
-
-                <div class="empty-icon">
-                    📊
-                </div>
-
-                <strong>
-                    No campaigns
-                </strong>
-
-                <span>
-                    Your campaigns will appear here
-                </span>
-
-            </div>
+                class="campaign-container"
+            ></div>
 
         </section>
 
 
-
-        <!-- =========================
-             PROFILE
-        ========================== -->
+        <!-- PROFILE -->
 
         <section
             id="profilePage"
@@ -601,105 +507,43 @@
                     👤
                 </div>
 
-
                 <h2 id="profileName">
                     Telegram User
                 </h2>
 
-
                 <span id="profileUsername">
-                    @username
+                    Telegram Account
                 </span>
 
             </div>
-
 
 
             <div class="profile-options">
 
                 <button>
 
-                    <span>
-                        👥
-                    </span>
+                    <span>💎</span>
 
                     <div>
 
                         <strong>
-                            Referral Program
+                            Promotion Credits
                         </strong>
 
-                        <small>
-                            Invite friends and earn
+                        <small id="profileCredits">
+                            100 credits
                         </small>
 
                     </div>
 
-                    <b>
-                        →
-                    </b>
+                    <b>›</b>
 
                 </button>
 
 
-                <button>
+                <button id="logoutButton">
 
-                    <span>
-                        👑
-                    </span>
-
-                    <div>
-
-                        <strong>
-                            Premium
-                        </strong>
-
-                        <small>
-                            Upgrade your account
-                        </small>
-
-                    </div>
-
-                    <b>
-                        →
-                    </b>
-
-                </button>
-
-
-                <button>
-
-                    <span>
-                        💬
-                    </span>
-
-                    <div>
-
-                        <strong>
-                            Support
-                        </strong>
-
-                        <small>
-                            Get help
-                        </small>
-
-                    </div>
-
-                    <b>
-                        →
-                    </b>
-
-                </button>
-
-
-                <button
-                    id="logoutButton"
-                    class="logout-option"
-                >
-
-                    <span>
-                        🚪
-                    </span>
+                    <span>🚪</span>
 
                     <div>
 
@@ -708,10 +552,12 @@
                         </strong>
 
                         <small>
-                            Sign out of PromoHub
+                            Disconnect this session
                         </small>
 
                     </div>
+
+                    <b>›</b>
 
                 </button>
 
@@ -720,10 +566,7 @@
         </section>
 
 
-
-        <!-- =========================
-             NAVIGATION
-        ========================== -->
+        <!-- NAVIGATION -->
 
         <nav class="bottom-navigation">
 
@@ -732,9 +575,7 @@
                 data-page="dashboardPage"
             >
 
-                <span>
-                    ⌂
-                </span>
+                <span>🏠</span>
 
                 <small>
                     Home
@@ -748,9 +589,7 @@
                 data-page="promotePage"
             >
 
-                <span>
-                    ◉
-                </span>
+                <span>🚀</span>
 
                 <small>
                     Promote
@@ -764,9 +603,7 @@
                 data-page="campaignsPage"
             >
 
-                <span>
-                    ◫
-                </span>
+                <span>📊</span>
 
                 <small>
                     Campaigns
@@ -780,9 +617,7 @@
                 data-page="profilePage"
             >
 
-                <span>
-                    ○
-                </span>
+                <span>👤</span>
 
                 <small>
                     Profile
@@ -795,10 +630,7 @@
     </main>
 
 
-
-    <!-- =========================
-         ACTION LOADER
-    ========================== -->
+    <!-- ACTION LOADER -->
 
     <div
         id="actionLoader"
@@ -814,8 +646,9 @@
     </div>
 
 
-    <script src="app.js"></script>
+    <script src="./app.js"></script>
 
 </body>
 
 </html>
+
