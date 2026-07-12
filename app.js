@@ -1,1004 +1,468 @@
-// =========================
-// TELEGRAM MINI APP
-// =========================
+<!DOCTYPE html>
+<html lang="en">
 
-const tg = window.Telegram?.WebApp;
+<head>
+    <meta charset="UTF-8">
 
-if (tg) {
-    tg.ready();
-    tg.expand();
-}
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
+    <title>PromoHub</title>
 
-// =========================
-// ELEMENTS
-// =========================
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
 
-const loader = document.getElementById("loader");
-const loadingText = document.getElementById("loadingText");
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
 
-const loginPage = document.getElementById("loginPage");
-const app = document.getElementById("app");
 
-const loginButton = document.getElementById("loginButton");
-const logoutButton = document.getElementById("logoutButton");
+<body>
 
-const actionLoader = document.getElementById("actionLoader");
-const actionLoaderText = document.getElementById("actionLoaderText");
+    <!-- =========================
+         LOGIN PAGE
+    ========================== -->
 
-const userName = document.getElementById("userName");
-const profileName = document.getElementById("profileName");
-const profileUsername = document.getElementById("profileUsername");
+    <section
+        id="loginPage"
+        class="page login-page"
+    >
 
-const profileButton = document.getElementById("profileButton");
+        <div class="logo">
+            🚀
+        </div>
 
-const startPromotionButton = document.getElementById(
-    "startPromotionButton"
-);
+        <h1>PromoHub</h1>
 
-const quickPromoteButton = document.getElementById(
-    "quickPromoteButton"
-);
+        <p class="subtitle">
+            Promote your Telegram community
+            and grow your audience.
+        </p>
 
-const viewCampaignsButton = document.getElementById(
-    "viewCampaignsButton"
-);
 
-const createCampaignButton = document.getElementById(
-    "createCampaignButton"
-);
+        <button
+            id="loginButton"
+            class="primary-button"
+        >
+            Continue with Telegram
+        </button>
 
-const promotionLink = document.getElementById("promotionLink");
-const promotionAmount = document.getElementById("promotionAmount");
 
+        <p class="small-text">
+            Secure access through Telegram
+        </p>
 
-// =========================
-// APP DATA
-// =========================
+    </section>
 
-let currentUser = null;
-let promotionType = "reach";
 
-let campaigns = [];
 
+    <!-- =========================
+         APP
+    ========================== -->
 
-// =========================
-// LOADING SCREEN
-// =========================
+    <main
+        id="app"
+        class="app hidden"
+    >
 
-function wait(ms) {
 
-    return new Promise(resolve => {
+        <!-- =========================
+             DASHBOARD
+        ========================== -->
 
-        setTimeout(resolve, ms);
+        <section
+            id="dashboardPage"
+            class="page"
+        >
 
-    });
+            <header class="top-header">
 
-}
+                <div>
 
+                    <p class="welcome-text">
+                        Welcome back
+                    </p>
 
-async function startApp() {
+                    <h2 id="userName">
+                        Telegram User
+                    </h2>
 
-    loadingText.textContent =
-        "Connecting to Telegram...";
+                </div>
 
-    await wait(900);
 
+                <button
+                    id="profileButton"
+                    class="avatar"
+                >
+                    👤
+                </button>
 
-    loadingText.textContent =
-        "Loading account...";
+            </header>
 
-    await wait(800);
 
 
-    loadTelegramUser();
+            <div class="hero-card">
 
-    loadCampaigns();
+                <p>
+                    Promotion Balance
+                </p>
 
+                <h1 id="userBalance">
+                    0
+                </h1>
 
-    loadingText.textContent =
-        "Ready";
+                <span>
+                    Promotion credits
+                </span>
 
-    await wait(500);
+            </div>
 
 
-    loader.classList.add("hide-loader");
 
-    await wait(500);
+            <div class="stats-grid">
 
+                <div class="stat-card">
 
-    loader.classList.add("hidden");
+                    <span>
+                        🚀
+                    </span>
 
+                    <h3 id="campaignCount">
+                        0
+                    </h3>
 
-    checkLogin();
+                    <p>
+                        Campaigns
+                    </p>
 
-}
+                </div>
 
 
-startApp();
+                <div class="stat-card">
 
+                    <span>
+                        👥
+                    </span>
 
-// =========================
-// TELEGRAM USER
-// =========================
+                    <h3 id="totalReach">
+                        0
+                    </h3>
 
-function loadTelegramUser() {
+                    <p>
+                        Total Reach
+                    </p>
 
-    try {
+                </div>
 
-        if (
-            tg &&
-            tg.initDataUnsafe &&
-            tg.initDataUnsafe.user
-        ) {
+            </div>
 
-            const telegramUser =
-                tg.initDataUnsafe.user;
 
 
-            currentUser = {
+            <button
+                id="startPromotionButton"
+                class="primary-button"
+            >
+                🚀 Start Promotion
+            </button>
 
-                id: telegramUser.id,
 
-                firstName:
-                    telegramUser.first_name ||
-                    "Telegram User",
+            <div class="section-header">
 
-                lastName:
-                    telegramUser.last_name ||
-                    "",
+                <h3>
+                    Recent Campaigns
+                </h3>
 
-                username:
-                    telegramUser.username ||
-                    ""
+            </div>
 
-            };
 
+            <div
+                id="recentCampaigns"
+                class="empty-state"
+            >
 
-            localStorage.setItem(
-                "promoUser",
-                JSON.stringify(currentUser)
-            );
+                <span>
+                    📭
+                </span>
 
-        }
+                <p>
+                    No campaigns yet
+                </p>
 
-    }
+            </div>
 
-    catch (error) {
+        </section>
 
-        console.log(
-            "Telegram user error:",
-            error
-        );
 
-    }
 
-}
+        <!-- =========================
+             PROMOTE PAGE
+        ========================== -->
 
+        <section
+            id="promotePage"
+            class="page hidden"
+        >
 
-// =========================
-// CHECK LOGIN
-// =========================
+            <h2>
+                🚀 Create Promotion
+            </h2>
 
-function checkLogin() {
 
-    const savedUser =
-        localStorage.getItem("promoUser");
+            <label>
+                Telegram Link
+            </label>
 
+            <input
+                id="promotionLink"
+                type="url"
+                placeholder="https://t.me/yourgroup"
+            >
 
-    if (savedUser) {
 
-        try {
+            <label>
+                Promotion Type
+            </label>
 
-            currentUser =
-                JSON.parse(savedUser);
 
+            <div class="option-grid">
 
-            openApp();
+                <button
+                    class="option-card active"
+                    data-type="reach"
+                >
 
-        }
+                    📢
 
-        catch (error) {
+                    <strong>
+                        Link Reach
+                    </strong>
 
-            localStorage.removeItem(
-                "promoUser"
-            );
+                    <small>
+                        Share your link
+                    </small>
 
+                </button>
 
-            showLogin();
 
-        }
+                <button
+                    class="option-card"
+                    data-type="members"
+                >
 
-    }
+                    👥
 
-    else {
+                    <strong>
+                        Verified Joins
+                    </strong>
 
-        showLogin();
+                    <small>
+                        Track voluntary joins
+                    </small>
 
-    }
+                </button>
 
-}
+            </div>
 
 
-// =========================
-// SHOW LOGIN
-// =========================
 
-function showLogin() {
+            <label>
+                Promotion Amount
+            </label>
 
-    app.classList.add("hidden");
 
-    loginPage.classList.remove("hidden");
+            <select id="promotionAmount">
 
-}
+                <option value="100">
+                    100 Reach
+                </option>
 
+                <option value="500">
+                    500 Reach
+                </option>
 
-// =========================
-// OPEN APP
-// =========================
+                <option value="1000">
+                    1,000 Reach
+                </option>
 
-function openApp() {
+            </select>
 
-    loginPage.classList.add("hidden");
 
-    app.classList.remove("hidden");
 
+            <button
+                id="createCampaignButton"
+                class="primary-button"
+            >
+                Create Campaign
+            </button>
 
-    updateUserUI();
+        </section>
 
-    updateCampaignUI();
 
-    openPage("dashboardPage");
 
-}
+        <!-- =========================
+             CAMPAIGNS PAGE
+        ========================== -->
 
+        <section
+            id="campaignsPage"
+            class="page hidden"
+        >
 
-// =========================
-// LOGIN
-// =========================
+            <h2>
+                📊 My Campaigns
+            </h2>
 
-loginButton.addEventListener(
-    "click",
-    async function () {
 
-        showActionLoader(
-            "Connecting your account..."
-        );
+            <div
+                id="campaignList"
+                class="empty-state"
+            >
 
+                <span>
+                    📭
+                </span>
 
-        await wait(1000);
+                <p>
+                    You have no campaigns
+                </p>
 
+            </div>
 
-        loadTelegramUser();
+        </section>
 
 
-        if (!currentUser) {
 
-            hideActionLoader();
+        <!-- =========================
+             PROFILE PAGE
+        ========================== -->
 
+        <section
+            id="profilePage"
+            class="page hidden"
+        >
 
-            alert(
-                "Please open PromoHub inside Telegram."
-            );
+            <div class="profile-card">
 
+                <div class="profile-avatar">
+                    👤
+                </div>
 
-            return;
 
-        }
+                <h2 id="profileName">
+                    Telegram User
+                </h2>
 
 
-        localStorage.setItem(
-            "promoUser",
-            JSON.stringify(currentUser)
-        );
+                <p id="profileUsername">
+                    @username
+                </p>
 
+            </div>
 
-        await wait(500);
 
 
-        hideActionLoader();
+            <div class="profile-menu">
 
-        openApp();
+                <button>
+                    👥 Referral Program
+                </button>
 
-    }
-);
 
+                <button>
+                    👑 Premium
+                </button>
 
-// =========================
-// LOGOUT
-// =========================
 
-logoutButton.addEventListener(
-    "click",
-    async function () {
+                <button>
+                    💬 Support
+                </button>
 
-        showActionLoader(
-            "Logging out..."
-        );
 
+                <button
+                    id="logoutButton"
+                    class="logout-button"
+                >
+                    🚪 Log Out
+                </button>
 
-        await wait(800);
+            </div>
 
+        </section>
 
-        localStorage.removeItem(
-            "promoUser"
-        );
 
 
-        currentUser = null;
+        <!-- =========================
+             BOTTOM NAVIGATION
+        ========================== -->
 
+        <nav class="bottom-nav">
 
-        hideActionLoader();
+            <button
+                class="nav-button active"
+                data-page="dashboardPage"
+            >
 
-        showLogin();
+                🏠
 
-    }
-);
+                <span>
+                    Home
+                </span>
 
+            </button>
 
-// =========================
-// USER UI
-// =========================
 
-function updateUserUI() {
+            <button
+                class="nav-button"
+                data-page="promotePage"
+            >
 
-    if (!currentUser) {
-        return;
-    }
+                🚀
 
+                <span>
+                    Promote
+                </span>
 
-    const fullName = (
+            </button>
 
-        currentUser.firstName +
 
-        " " +
+            <button
+                class="nav-button"
+                data-page="campaignsPage"
+            >
 
-        currentUser.lastName
-
-    ).trim();
-
-
-    userName.textContent =
-        fullName;
-
-
-    profileName.textContent =
-        fullName;
-
-
-    if (currentUser.username) {
-
-        profileUsername.textContent =
-            "@" + currentUser.username;
-
-    }
-
-    else {
-
-        profileUsername.textContent =
-            "Telegram ID: " +
-            currentUser.id;
-
-    }
-
-}
-
-
-// =========================
-// PAGE NAVIGATION
-// =========================
-
-function openPage(pageId) {
-
-    const pages =
-        document.querySelectorAll(".page");
-
-
-    pages.forEach(page => {
-
-        page.classList.add("hidden");
-
-    });
-
-
-    const selectedPage =
-        document.getElementById(pageId);
-
-
-    if (selectedPage) {
-
-        selectedPage.classList.remove(
-            "hidden"
-        );
-
-    }
-
-
-    const navButtons =
-        document.querySelectorAll(
-            ".nav-button"
-        );
-
-
-    navButtons.forEach(button => {
-
-        button.classList.remove("active");
-
-
-        if (
-            button.dataset.page === pageId
-        ) {
-
-            button.classList.add("active");
-
-        }
-
-    });
-
-
-    window.scrollTo({
-
-        top: 0,
-
-        behavior: "smooth"
-
-    });
-
-}
-
-
-document
-    .querySelectorAll(".nav-button")
-    .forEach(button => {
-
-        button.addEventListener(
-            "click",
-            function () {
-
-                openPage(
-                    this.dataset.page
-                );
-
-            }
-        );
-
-    });
-
-
-// =========================
-// QUICK NAVIGATION
-// =========================
-
-profileButton.addEventListener(
-    "click",
-    function () {
-
-        openPage("profilePage");
-
-    }
-);
-
-
-startPromotionButton.addEventListener(
-    "click",
-    function () {
-
-        openPage("promotePage");
-
-    }
-);
-
-
-quickPromoteButton.addEventListener(
-    "click",
-    function () {
-
-        openPage("promotePage");
-
-    }
-);
-
-
-viewCampaignsButton.addEventListener(
-    "click",
-    function () {
-
-        openPage("campaignsPage");
-
-    }
-);
-
-
-// =========================
-// PROMOTION TYPE
-// =========================
-
-const promotionOptions =
-    document.querySelectorAll(
-        ".promotion-option"
-    );
-
-
-promotionOptions.forEach(option => {
-
-    option.addEventListener(
-        "click",
-        function () {
-
-            promotionOptions.forEach(
-                item => {
-
-                    item.classList.remove(
-                        "selected"
-                    );
-
-                }
-            );
-
-
-            this.classList.add(
-                "selected"
-            );
-
-
-            promotionType =
-                this.dataset.type;
-
-        }
-    );
-
-});
-
-
-// =========================
-// CREATE CAMPAIGN
-// =========================
-
-createCampaignButton.addEventListener(
-    "click",
-    async function () {
-
-        const link =
-            promotionLink.value.trim();
-
-
-        const amount =
-            parseInt(
-                promotionAmount.value
-            );
-
-
-        if (!link) {
-
-            alert(
-                "Please enter your Telegram link."
-            );
-
-            return;
-
-        }
-
-
-        if (
-            !link.startsWith(
-                "https://t.me/"
-            )
-        ) {
-
-            alert(
-                "Please enter a valid Telegram link."
-            );
-
-            return;
-
-        }
-
-
-        showActionLoader(
-            "Creating campaign..."
-        );
-
-
-        await wait(1200);
-
-
-        const campaign = {
-
-            id:
-                Date.now(),
-
-            link:
-                link,
-
-            type:
-                promotionType,
-
-            amount:
-                amount,
-
-            delivered:
-                0,
-
-            status:
-                "Active",
-
-            created:
-                new Date().toISOString()
-
-        };
-
-
-        campaigns.unshift(
-            campaign
-        );
-
-
-        saveCampaigns();
-
-
-        promotionLink.value = "";
-
-
-        hideActionLoader();
-
-
-        updateCampaignUI();
-
-
-        openPage(
-            "campaignsPage"
-        );
-
-    }
-);
-
-
-// =========================
-// SAVE CAMPAIGNS
-// =========================
-
-function saveCampaigns() {
-
-    if (!currentUser) {
-        return;
-    }
-
-
-    localStorage.setItem(
-
-        "promoCampaigns_" +
-        currentUser.id,
-
-        JSON.stringify(campaigns)
-
-    );
-
-}
-
-
-// =========================
-// LOAD CAMPAIGNS
-// =========================
-
-function loadCampaigns() {
-
-    const savedUser =
-        localStorage.getItem(
-            "promoUser"
-        );
-
-
-    if (!savedUser) {
-
-        campaigns = [];
-
-        return;
-
-    }
-
-
-    try {
-
-        const user =
-            JSON.parse(savedUser);
-
-
-        const savedCampaigns =
-            localStorage.getItem(
-
-                "promoCampaigns_" +
-                user.id
-
-            );
-
-
-        if (savedCampaigns) {
-
-            campaigns =
-                JSON.parse(
-                    savedCampaigns
-                );
-
-        }
-
-        else {
-
-            campaigns = [];
-
-        }
-
-    }
-
-    catch (error) {
-
-        campaigns = [];
-
-    }
-
-}
-
-
-// =========================
-// CAMPAIGN UI
-// =========================
-
-function updateCampaignUI() {
-
-    loadCampaigns();
-
-
-    const campaignCount =
-        document.getElementById(
-            "campaignCount"
-        );
-
-
-    const totalReach =
-        document.getElementById(
-            "totalReach"
-        );
-
-
-    const campaignList =
-        document.getElementById(
-            "campaignList"
-        );
-
-
-    const recentCampaigns =
-        document.getElementById(
-            "recentCampaigns"
-        );
-
-
-    campaignCount.textContent =
-        campaigns.length;
-
-
-    const reach =
-        campaigns.reduce(
-
-            (total, campaign) => {
-
-                return total +
-                    Number(
-                        campaign.delivered || 0
-                    );
-
-            },
-
-            0
-
-        );
-
-
-    totalReach.textContent =
-        reach;
-
-
-    if (campaigns.length === 0) {
-
-        campaignList.innerHTML = `
-
-            <div class="empty-icon">
                 📊
-            </div>
-
-            <strong>
-                No campaigns
-            </strong>
-
-            <span>
-                Your campaigns will appear here
-            </span>
-
-        `;
-
-
-        recentCampaigns.innerHTML = `
-
-            <div class="empty-icon">
-                📭
-            </div>
-
-            <strong>
-                No campaigns yet
-            </strong>
-
-            <span>
-                Start your first promotion campaign
-            </span>
-
-        `;
-
-
-        return;
-
-    }
-
-
-    campaignList.innerHTML = "";
-
-
-    campaigns.forEach(campaign => {
-
-        const card =
-            createCampaignCard(
-                campaign
-            );
-
-
-        campaignList.appendChild(
-            card
-        );
-
-    });
-
-
-    recentCampaigns.innerHTML = "";
-
-
-    campaigns
-        .slice(0, 2)
-        .forEach(campaign => {
-
-            const card =
-                createCampaignCard(
-                    campaign
-                );
-
-
-            recentCampaigns.appendChild(
-                card
-            );
-
-        });
-
-}
-
-
-// =========================
-// CREATE CAMPAIGN CARD
-// =========================
-
-function createCampaignCard(campaign) {
-
-    const card =
-        document.createElement("div");
-
-
-    card.className =
-        "campaign-card";
-
-
-    const progress = Math.min(
-
-        100,
-
-        Math.round(
-
-            (
-                Number(
-                    campaign.delivered
-                )
-                /
-
-                Number(
-                    campaign.amount
-                )
-
-            ) * 100
-
-        )
-
-    );
-
-
-    card.innerHTML = `
-
-        <div class="campaign-top">
-
-            <div>
-
-                <strong>
-                    ${
-                        campaign.type === "joins"
-                        ? "👥 Verified Joins"
-                        : "📢 Link Reach"
-                    }
-                </strong>
 
                 <span>
-                    ${campaign.link}
+                    Campaigns
                 </span>
 
-            </div>
+            </button>
 
 
-            <b>
-                ${campaign.status}
-            </b>
+            <button
+                class="nav-button"
+                data-page="profilePage"
+            >
 
-        </div>
-
-
-        <div class="campaign-progress">
-
-            <div class="progress-info">
+                👤
 
                 <span>
-                    Progress
+                    Profile
                 </span>
 
-                <strong>
-                    ${campaign.delivered}
-                    /
-                    ${campaign.amount}
-                </strong>
+            </button>
 
-            </div>
+        </nav>
 
 
-            <div class="progress-bar">
-
-                <div
-                    class="progress-fill"
-                    style="width: ${progress}%"
-                ></div>
-
-            </div>
-
-        </div>
-
-    `;
+    </main>
 
 
-    return card;
+    <script src="app.js"></script>
 
-}
+</body>
 
-
-// =========================
-// ACTION LOADER
-// =========================
-
-function showActionLoader(text) {
-
-    actionLoaderText.textContent =
-        text || "Processing...";
-
-
-    actionLoader.classList.remove(
-        "hidden"
-    );
-
-}
-
-
-function hideActionLoader() {
-
-    actionLoader.classList.add(
-        "hidden"
-    );
-
-}
+</html>
