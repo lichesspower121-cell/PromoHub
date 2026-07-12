@@ -1,1420 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
 
-/* =========================
-   RESET + ROOT
-========================= */
-
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
-
-:root {
-    --background: #070910;
-    --surface: rgba(255, 255, 255, 0.055);
-    --surface-strong: rgba(255, 255, 255, 0.09);
-    --border: rgba(255, 255, 255, 0.09);
-    --text: #ffffff;
-    --muted: #9298aa;
-    --accent: #7c5cff;
-    --accent-light: #a892ff;
-}
-
-html,
-body {
-    min-height: 100%;
-}
-
-html {
-    scroll-behavior: smooth;
-}
-
-body {
-    background:
-        radial-gradient(
-            circle at 90% 0%,
-            rgba(124, 92, 255, 0.18),
-            transparent 35%
-        ),
-        radial-gradient(
-            circle at 0% 70%,
-            rgba(77, 121, 255, 0.1),
-            transparent 35%
-        ),
-        var(--background);
+<head>
+    <meta charset="UTF-8">
 
-    color: var(--text);
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-    font-family:
-        Arial,
-        Helvetica,
-        sans-serif;
+    <title>PromoHub</title>
 
-    overflow-x: hidden;
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
 
-    -webkit-tap-highlight-color: transparent;
-}
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
 
-button,
-input,
-select {
-    font: inherit;
-}
 
-button {
-    border: none;
-    cursor: pointer;
-}
+<body>
 
-.hidden {
-    display: none !important;
-}
+    <!-- =========================
+         LOGIN PAGE
+    ========================== -->
 
+    <section
+        id="loginPage"
+        class="page login-page"
+    >
 
-/* =========================
-   LOADING SCREEN
-========================= */
+        <div class="logo">
+            🚀
+        </div>
 
-.loader-screen {
-    position: fixed;
-    inset: 0;
+        <h1>PromoHub</h1>
 
-    z-index: 9999;
+        <p class="subtitle">
+            Promote your Telegram community
+            and grow your audience.
+        </p>
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
 
-    background:
-        radial-gradient(
-            circle at center,
-            rgba(124, 92, 255, 0.18),
-            transparent 35%
-        ),
-        #070910;
+        <button
+            id="loginButton"
+            class="primary-button"
+        >
+            Continue with Telegram
+        </button>
 
-    transition:
-        opacity 0.5s ease,
-        visibility 0.5s ease;
-}
 
-.loader-screen.hide-loader {
-    opacity: 0;
-    visibility: hidden;
-}
+        <p class="small-text">
+            Secure access through Telegram
+        </p>
 
-.loader-content {
-    width: 100%;
+    </section>
 
-    padding: 30px;
 
-    text-align: center;
-}
 
-.loader-logo {
-    position: relative;
+    <!-- =========================
+         APP
+    ========================== -->
 
-    width: 90px;
-    height: 90px;
+    <main
+        id="app"
+        class="app hidden"
+    >
 
-    margin: 0 auto 25px;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+        <!-- =========================
+             DASHBOARD
+        ========================== -->
 
-    border: 1px solid var(--border);
-    border-radius: 28px;
+        <section
+            id="dashboardPage"
+            class="page"
+        >
 
-    background: rgba(255, 255, 255, 0.06);
+            <header class="top-header">
 
-    font-size: 42px;
+                <div>
 
-    animation:
-        logoFloat 2.5s ease-in-out infinite;
-}
+                    <p class="welcome-text">
+                        Welcome back
+                    </p>
 
-.logo-glow {
-    position: absolute;
+                    <h2 id="userName">
+                        Telegram User
+                    </h2>
 
-    inset: -20px;
+                </div>
 
-    z-index: -1;
 
-    border-radius: 50%;
+                <button
+                    id="profileButton"
+                    class="avatar"
+                >
+                    👤
+                </button>
 
-    background: rgba(124, 92, 255, 0.3);
+            </header>
 
-    filter: blur(35px);
 
-    animation:
-        glowPulse 2s ease-in-out infinite;
-}
 
-.loader-content h1 {
-    font-size: 32px;
+            <div class="hero-card">
 
-    letter-spacing: -1px;
-}
+                <p>
+                    Promotion Balance
+                </p>
 
-.loader-content p {
-    margin-top: 8px;
+                <h1 id="userBalance">
+                    0
+                </h1>
 
-    color: var(--muted);
-}
+                <span>
+                    Promotion credits
+                </span>
 
-.spinner {
-    width: 48px;
-    height: 48px;
+            </div>
 
-    margin: 40px auto 20px;
-}
 
-.spinner-ring {
-    width: 100%;
-    height: 100%;
 
-    border: 3px solid rgba(255, 255, 255, 0.08);
-    border-top-color: var(--accent-light);
+            <div class="stats-grid">
 
-    border-radius: 50%;
+                <div class="stat-card">
 
-    animation:
-        spin 0.8s linear infinite;
-}
+                    <span>
+                        🚀
+                    </span>
 
-.loading-text {
-    color: var(--muted);
+                    <h3 id="campaignCount">
+                        0
+                    </h3>
 
-    font-size: 13px;
-}
+                    <p>
+                        Campaigns
+                    </p>
 
+                </div>
 
-/* =========================
-   LOGIN PAGE
-========================= */
 
-.login-page {
-    position: relative;
+                <div class="stat-card">
 
-    min-height: 100vh;
+                    <span>
+                        👥
+                    </span>
 
-    display: flex;
-    align-items: center;
+                    <h3 id="totalReach">
+                        0
+                    </h3>
 
-    padding:
-        max(30px, env(safe-area-inset-top))
-        25px
-        max(30px, env(safe-area-inset-bottom));
+                    <p>
+                        Total Reach
+                    </p>
 
-    overflow: hidden;
-}
+                </div>
 
-.login-background {
-    position: absolute;
+            </div>
 
-    inset: 0;
 
-    pointer-events: none;
-}
 
-.orb {
-    position: absolute;
+            <button
+                id="startPromotionButton"
+                class="primary-button"
+            >
+                🚀 Start Promotion
+            </button>
 
-    width: 280px;
-    height: 280px;
 
-    border-radius: 50%;
+            <div class="section-header">
 
-    filter: blur(80px);
+                <h3>
+                    Recent Campaigns
+                </h3>
 
-    opacity: 0.3;
+            </div>
 
-    animation:
-        orbMove 8s ease-in-out infinite;
-}
 
-.orb-one {
-    top: -80px;
-    right: -100px;
+            <div
+                id="recentCampaigns"
+                class="empty-state"
+            >
 
-    background: var(--accent);
-}
+                <span>
+                    📭
+                </span>
 
-.orb-two {
-    bottom: -100px;
-    left: -120px;
+                <p>
+                    No campaigns yet
+                </p>
 
-    background: #365cff;
+            </div>
 
-    animation-delay: -4s;
-}
+        </section>
 
-.login-content {
-    position: relative;
 
-    z-index: 2;
 
-    width: 100%;
-}
+        <!-- =========================
+             PROMOTE PAGE
+        ========================== -->
 
-.brand-icon {
-    width: 65px;
-    height: 65px;
+        <section
+            id="promotePage"
+            class="page hidden"
+        >
 
-    margin-bottom: 35px;
+            <h2>
+                🚀 Create Promotion
+            </h2>
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
 
-    border-radius: 20px;
+            <label>
+                Telegram Link
+            </label>
 
-    background:
-        linear-gradient(
-            135deg,
-            var(--accent),
-            #4d6fff
-        );
+            <input
+                id="promotionLink"
+                type="url"
+                placeholder="https://t.me/yourgroup"
+            >
 
-    box-shadow:
-        0 20px 50px rgba(124, 92, 255, 0.3);
 
-    font-size: 30px;
-}
+            <label>
+                Promotion Type
+            </label>
 
-.brand > span,
-.greeting,
-.section-title span,
-.page-heading > span,
-.stat-card > span,
-.balance-top > span,
-.form-card label {
-    color: var(--accent-light);
 
-    font-size: 11px;
-    font-weight: 700;
+            <div class="option-grid">
 
-    letter-spacing: 1.8px;
-}
+                <button
+                    class="option-card active"
+                    data-type="reach"
+                >
 
-.brand h1 {
-    margin-top: 12px;
+                    📢
 
-    font-size: clamp(48px, 14vw, 72px);
+                    <strong>
+                        Link Reach
+                    </strong>
 
-    line-height: 0.92;
+                    <small>
+                        Share your link
+                    </small>
 
-    letter-spacing: -4px;
-}
+                </button>
 
-.brand h1 strong {
-    color: var(--accent-light);
-}
 
-.login-description {
-    max-width: 420px;
+                <button
+                    class="option-card"
+                    data-type="members"
+                >
 
-    margin: 30px 0;
+                    👥
 
-    color: var(--muted);
+                    <strong>
+                        Verified Joins
+                    </strong>
 
-    font-size: 16px;
+                    <small>
+                        Track voluntary joins
+                    </small>
 
-    line-height: 1.6;
-}
+                </button>
 
-.main-button {
-    width: 100%;
-    min-height: 58px;
+            </div>
 
-    padding: 0 22px;
 
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
 
-    color: white;
+            <label>
+                Promotion Amount
+            </label>
 
-    border-radius: 18px;
 
-    background:
-        linear-gradient(
-            135deg,
-            var(--accent),
-            #566dff
-        );
+            <select id="promotionAmount">
 
-    font-weight: 700;
+                <option value="100">
+                    100 Reach
+                </option>
 
-    box-shadow:
-        0 18px 40px rgba(124, 92, 255, 0.25);
+                <option value="500">
+                    500 Reach
+                </option>
 
-    transition:
-        transform 0.2s ease,
-        opacity 0.2s ease,
-        box-shadow 0.2s ease;
-}
+                <option value="1000">
+                    1,000 Reach
+                </option>
 
-.main-button:active {
-    transform: scale(0.97);
-}
+            </select>
 
-.main-button:hover {
-    box-shadow:
-        0 20px 50px rgba(124, 92, 255, 0.35);
-}
 
-.button-arrow {
-    font-size: 22px;
-}
 
-.secure-text {
-    margin-top: 18px;
+            <button
+                id="createCampaignButton"
+                class="primary-button"
+            >
+                Create Campaign
+            </button>
 
-    color: var(--muted);
+        </section>
 
-    font-size: 12px;
 
-    text-align: center;
-}
 
+        <!-- =========================
+             CAMPAIGNS PAGE
+        ========================== -->
 
-/* =========================
-   APP
-========================= */
+        <section
+            id="campaignsPage"
+            class="page hidden"
+        >
 
-.app {
-    width: 100%;
-    max-width: 600px;
+            <h2>
+                📊 My Campaigns
+            </h2>
 
-    min-height: 100vh;
 
-    margin: 0 auto;
+            <div
+                id="campaignList"
+                class="empty-state"
+            >
 
-    padding-bottom: 110px;
-}
+                <span>
+                    📭
+                </span>
 
-.page {
-    min-height: 100vh;
+                <p>
+                    You have no campaigns
+                </p>
 
-    padding:
-        max(25px, env(safe-area-inset-top))
-        20px
-        120px;
+            </div>
 
-    animation:
-        pageEnter 0.35s ease;
-}
+        </section>
 
-.app-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
 
-    margin-bottom: 28px;
-}
 
-.app-header h2 {
-    margin-top: 5px;
+        <!-- =========================
+             PROFILE PAGE
+        ========================== -->
 
-    font-size: 25px;
+        <section
+            id="profilePage"
+            class="page hidden"
+        >
 
-    letter-spacing: -1px;
-}
+            <div class="profile-card">
 
-.user-avatar {
-    position: relative;
+                <div class="profile-avatar">
+                    👤
+                </div>
 
-    width: 50px;
-    height: 50px;
 
-    border: 1px solid var(--border);
-    border-radius: 17px;
+                <h2 id="profileName">
+                    Telegram User
+                </h2>
 
-    color: white;
 
-    background: var(--surface-strong);
+                <p id="profileUsername">
+                    @username
+                </p>
 
-    font-size: 22px;
-}
+            </div>
 
-.online-dot {
-    position: absolute;
 
-    right: -1px;
-    bottom: 2px;
 
-    width: 12px;
-    height: 12px;
+            <div class="profile-menu">
 
-    border: 3px solid var(--background);
-    border-radius: 50%;
+                <button>
+                    👥 Referral Program
+                </button>
 
-    background: #4be38b;
-}
 
+                <button>
+                    👑 Premium
+                </button>
 
-/* =========================
-   BALANCE CARD
-========================= */
 
-.balance-card {
-    position: relative;
+                <button>
+                    💬 Support
+                </button>
 
-    padding: 25px;
 
-    border:
-        1px solid rgba(168, 146, 255, 0.2);
+                <button
+                    id="logoutButton"
+                    class="logout-button"
+                >
+                    🚪 Log Out
+                </button>
 
-    border-radius: 28px;
+            </div>
 
-    background:
-        linear-gradient(
-            145deg,
-            rgba(124, 92, 255, 0.25),
-            rgba(255, 255, 255, 0.04)
-        );
+        </section>
 
-    overflow: hidden;
 
-    box-shadow:
-        0 25px 60px rgba(0, 0, 0, 0.25);
-}
 
-.card-glow {
-    position: absolute;
+        <!-- =========================
+             BOTTOM NAVIGATION
+        ========================== -->
 
-    width: 180px;
-    height: 180px;
+        <nav class="bottom-nav">
 
-    right: -70px;
-    top: -80px;
+            <button
+                class="nav-button active"
+                data-page="dashboardPage"
+            >
 
-    border-radius: 50%;
+                🏠
 
-    background:
-        rgba(124, 92, 255, 0.4);
+                <span>
+                    Home
+                </span>
 
-    filter: blur(50px);
-}
+            </button>
 
-.balance-top {
-    position: relative;
 
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
+            <button
+                class="nav-button"
+                data-page="promotePage"
+            >
 
-.credit-icon {
-    font-size: 20px;
-}
+                🚀
 
-.balance-card h1 {
-    position: relative;
+                <span>
+                    Promote
+                </span>
 
-    margin-top: 18px;
+            </button>
 
-    font-size: 58px;
 
-    letter-spacing: -4px;
-}
+            <button
+                class="nav-button"
+                data-page="campaignsPage"
+            >
 
-.balance-card p {
-    position: relative;
+                📊
 
-    margin-top: 3px;
+                <span>
+                    Campaigns
+                </span>
 
-    color: var(--muted);
-}
+            </button>
 
-.card-button {
-    position: relative;
 
-    width: 100%;
+            <button
+                class="nav-button"
+                data-page="profilePage"
+            >
 
-    margin-top: 25px;
+                👤
 
-    padding: 16px 18px;
+                <span>
+                    Profile
+                </span>
 
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+            </button>
 
-    color: white;
+        </nav>
 
-    border: 1px solid var(--border);
-    border-radius: 16px;
 
-    background:
-        rgba(255, 255, 255, 0.1);
+    </main>
 
-    font-weight: 700;
 
-    backdrop-filter: blur(15px);
+    <script src="app.js"></script>
 
-    transition:
-        transform 0.2s ease;
-}
+</body>
 
-.card-button:active {
-    transform: scale(0.98);
-}
-
-
-/* =========================
-   STATS
-========================= */
-
-.stats-grid {
-    display: grid;
-
-    grid-template-columns:
-        repeat(2, 1fr);
-
-    gap: 12px;
-
-    margin-top: 14px;
-}
-
-.stat-card {
-    padding: 20px;
-
-    border: 1px solid var(--border);
-    border-radius: 22px;
-
-    background: var(--surface);
-
-    backdrop-filter: blur(20px);
-}
-
-.stat-icon {
-    width: 40px;
-    height: 40px;
-
-    margin-bottom: 20px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    border-radius: 13px;
-
-    background:
-        rgba(124, 92, 255, 0.13);
-}
-
-.stat-card h2 {
-    margin: 8px 0 4px;
-
-    font-size: 30px;
-}
-
-.stat-card small {
-    color: var(--muted);
-}
-
-
-/* =========================
-   SECTIONS
-========================= */
-
-.section-title {
-    margin: 32px 2px 15px;
-
-    display: flex;
-    align-items: end;
-    justify-content: space-between;
-}
-
-.section-title h3 {
-    margin-top: 5px;
-
-    font-size: 20px;
-}
-
-.section-title button {
-    color: var(--accent-light);
-
-    background: transparent;
-
-    font-size: 13px;
-}
-
-.promote-action {
-    width: 100%;
-
-    padding: 18px;
-
-    display: flex;
-    align-items: center;
-
-    border: 1px solid var(--border);
-    border-radius: 22px;
-
-    color: white;
-
-    background: var(--surface);
-
-    text-align: left;
-
-    transition:
-        transform 0.2s ease,
-        border-color 0.2s ease;
-}
-
-.promote-action:active {
-    transform: scale(0.98);
-}
-
-.action-icon {
-    width: 52px;
-    height: 52px;
-
-    flex-shrink: 0;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    border-radius: 17px;
-
-    background:
-        linear-gradient(
-            135deg,
-            rgba(124, 92, 255, 0.25),
-            rgba(77, 111, 255, 0.15)
-        );
-
-    font-size: 23px;
-}
-
-.action-text {
-    flex: 1;
-
-    display: flex;
-    flex-direction: column;
-
-    margin-left: 15px;
-}
-
-.action-text span {
-    margin-top: 5px;
-
-    color: var(--muted);
-
-    font-size: 12px;
-}
-
-.action-arrow {
-    color: var(--accent-light);
-
-    font-size: 22px;
-}
-
-.empty-card {
-    width: 100%;
-    min-height: 180px;
-
-    padding: 25px;
-
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-
-    border: 1px dashed var(--border);
-    border-radius: 24px;
-
-    background:
-        rgba(255, 255, 255, 0.025);
-
-    text-align: center;
-}
-
-.empty-icon {
-    margin-bottom: 15px;
-
-    font-size: 32px;
-}
-
-.empty-card span {
-    margin-top: 7px;
-
-    color: var(--muted);
-
-    font-size: 13px;
-}
-
-
-/* =========================
-   PAGE HEADING
-========================= */
-
-.page-heading {
-    margin: 15px 0 30px;
-}
-
-.page-heading h1 {
-    margin: 8px 0;
-
-    font-size: 38px;
-
-    letter-spacing: -2px;
-}
-
-.page-heading p {
-    color: var(--muted);
-}
-
-
-/* =========================
-   PROMOTION FORM
-========================= */
-
-.form-card {
-    padding: 20px;
-
-    border: 1px solid var(--border);
-    border-radius: 25px;
-
-    background: var(--surface);
-
-    backdrop-filter: blur(20px);
-}
-
-.form-card label {
-    display: block;
-
-    margin: 22px 0 10px;
-}
-
-.form-card label:first-child {
-    margin-top: 0;
-}
-
-.input-box {
-    min-height: 58px;
-
-    padding: 0 16px;
-
-    display: flex;
-    align-items: center;
-
-    border: 1px solid var(--border);
-    border-radius: 17px;
-
-    background:
-        rgba(0, 0, 0, 0.2);
-
-    transition:
-        border-color 0.2s ease,
-        box-shadow 0.2s ease;
-}
-
-.input-box:focus-within {
-    border-color:
-        rgba(168, 146, 255, 0.7);
-
-    box-shadow:
-        0 0 0 3px rgba(124, 92, 255, 0.1);
-}
-
-.input-box input,
-.input-box select {
-    width: 100%;
-
-    margin-left: 12px;
-
-    color: white;
-
-    border: none;
-    outline: none;
-
-    background: transparent;
-}
-
-.input-box input::placeholder {
-    color: #686e80;
-}
-
-.input-box select option {
-    color: black;
-}
-
-.promotion-options {
-    display: grid;
-
-    grid-template-columns:
-        repeat(2, 1fr);
-
-    gap: 10px;
-}
-
-.promotion-option {
-    min-height: 145px;
-
-    padding: 18px 12px;
-
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: center;
-
-    color: white;
-
-    border: 1px solid var(--border);
-    border-radius: 20px;
-
-    background:
-        rgba(255, 255, 255, 0.03);
-
-    text-align: left;
-
-    transition:
-        transform 0.2s ease,
-        border-color 0.2s ease,
-        background 0.2s ease;
-}
-
-.promotion-option:active {
-    transform: scale(0.97);
-}
-
-.promotion-option.selected {
-    border-color: var(--accent);
-
-    background:
-        rgba(124, 92, 255, 0.13);
-
-    box-shadow:
-        inset 0 0 0 1px
-        rgba(124, 92, 255, 0.2);
-}
-
-.option-icon {
-    margin-bottom: 15px;
-
-    font-size: 28px;
-}
-
-.promotion-option small {
-    margin-top: 6px;
-
-    color: var(--muted);
-}
-
-.form-card .main-button {
-    margin-top: 25px;
-}
-
-
-/* =========================
-   CAMPAIGN CARDS
-========================= */
-
-.campaign-card {
-    width: 100%;
-
-    padding: 18px;
-
-    margin-bottom: 12px;
-
-    border: 1px solid var(--border);
-    border-radius: 20px;
-
-    background:
-        linear-gradient(
-            145deg,
-            rgba(255, 255, 255, 0.065),
-            rgba(255, 255, 255, 0.025)
-        );
-
-    text-align: left;
-
-    backdrop-filter: blur(20px);
-
-    box-shadow:
-        0 15px 35px rgba(0, 0, 0, 0.12);
-
-    animation:
-        campaignEnter 0.4s ease;
-}
-
-.campaign-top {
-    display: flex;
-    justify-content: space-between;
-
-    gap: 15px;
-}
-
-.campaign-top div {
-    min-width: 0;
-
-    display: flex;
-    flex-direction: column;
-}
-
-.campaign-top strong {
-    font-size: 15px;
-}
-
-.campaign-top span {
-    margin-top: 7px;
-
-    color: var(--muted);
-
-    font-size: 12px;
-
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.campaign-top b {
-    height: fit-content;
-
-    padding: 6px 9px;
-
-    color: var(--accent-light);
-
-    border:
-        1px solid rgba(168, 146, 255, 0.18);
-
-    border-radius: 20px;
-
-    background:
-        rgba(124, 92, 255, 0.1);
-
-    font-size: 10px;
-
-    text-transform: uppercase;
-}
-
-.campaign-progress {
-    margin-top: 20px;
-}
-
-.progress-info {
-    display: flex;
-    justify-content: space-between;
-
-    margin-bottom: 9px;
-
-    font-size: 12px;
-}
-
-.progress-info span {
-    color: var(--muted);
-}
-
-.progress-bar {
-    width: 100%;
-    height: 7px;
-
-    border-radius: 20px;
-
-    background:
-        rgba(255, 255, 255, 0.07);
-
-    overflow: hidden;
-}
-
-.progress-fill {
-    height: 100%;
-
-    border-radius: 20px;
-
-    background:
-        linear-gradient(
-            90deg,
-            var(--accent),
-            var(--accent-light)
-        );
-
-    box-shadow:
-        0 0 15px rgba(124, 92, 255, 0.5);
-
-    transition:
-        width 0.5s ease;
-}
-
-
-/* =========================
-   PROFILE
-========================= */
-
-.profile-header {
-    padding: 35px 20px;
-
-    text-align: center;
-}
-
-.large-avatar {
-    width: 90px;
-    height: 90px;
-
-    margin: 0 auto 18px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    border: 1px solid var(--border);
-    border-radius: 30px;
-
-    background:
-        linear-gradient(
-            135deg,
-            rgba(124, 92, 255, 0.3),
-            rgba(77, 111, 255, 0.1)
-        );
-
-    font-size: 40px;
-
-    box-shadow:
-        0 20px 50px rgba(124, 92, 255, 0.15);
-}
-
-.profile-header h2 {
-    font-size: 27px;
-}
-
-.profile-header > span {
-    display: block;
-
-    margin-top: 7px;
-
-    color: var(--muted);
-}
-
-.profile-options {
-    display: flex;
-    flex-direction: column;
-
-    gap: 10px;
-}
-
-.profile-options button {
-    width: 100%;
-
-    padding: 17px;
-
-    display: flex;
-    align-items: center;
-
-    color: white;
-
-    border: 1px solid var(--border);
-    border-radius: 19px;
-
-    background: var(--surface);
-
-    text-align: left;
-
-    transition:
-        transform 0.2s ease;
-}
-
-.profile-options button:active {
-    transform: scale(0.98);
-}
-
-.profile-options button > span {
-    width: 45px;
-    height: 45px;
-
-    flex-shrink: 0;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    border-radius: 14px;
-
-    background:
-        rgba(124, 92, 255, 0.12);
-
-    font-size: 20px;
-}
-
-.profile-options button div {
-    flex: 1;
-
-    display: flex;
-    flex-direction: column;
-
-    margin-left: 13px;
-}
-
-.profile-options button small {
-    margin-top: 5px;
-
-    color: var(--muted);
-}
-
-.profile-options button b {
-    color: var(--muted);
-
-    font-size: 20px;
-}
-
-.logout-option strong {
-    color: #ff7b86;
-}
-
-
-/* =========================
-   BOTTOM NAVIGATION
-========================= */
-
-.bottom-navigation {
-    position: fixed;
-
-    left: 50%;
-    bottom: 0;
-
-    z-index: 100;
-
-    width: 100%;
-    max-width: 600px;
-
-    padding:
-        10px
-        15px
-        max(10px, env(safe-area-inset-bottom));
-
-    display: grid;
-
-    grid-template-columns:
-        repeat(4, 1fr);
-
-    transform: translateX(-50%);
-
-    border-top: 1px solid var(--border);
-
-    background:
-        rgba(7, 9, 16, 0.88);
-
-    backdrop-filter: blur(25px);
-
-    -webkit-backdrop-filter: blur(25px);
-}
-
-.nav-button {
-    min-height: 55px;
-
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-
-    color: var(--muted);
-
-    background: transparent;
-
-    gap: 5px;
-}
-
-.nav-button > span {
-    font-size: 21px;
-
-    transition:
-        transform 0.2s ease;
-}
-
-.nav-button small {
-    font-size: 10px;
-}
-
-.nav-button.active {
-    color: var(--accent-light);
-}
-
-.nav-button.active > span {
-    transform:
-        translateY(-2px)
-        scale(1.1);
-}
-
-
-/* =========================
-   ACTION LOADER
-========================= */
-
-.action-loader {
-    position: fixed;
-
-    inset: 0;
-
-    z-index: 9998;
-
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-
-    gap: 18px;
-
-    background:
-        rgba(7, 9, 16, 0.85);
-
-    backdrop-filter: blur(15px);
-
-    -webkit-backdrop-filter: blur(15px);
-}
-
-.action-loader strong {
-    font-size: 14px;
-
-    letter-spacing: 0.3px;
-}
-
-.mini-spinner {
-    width: 45px;
-    height: 45px;
-
-    border:
-        3px solid rgba(255, 255, 255, 0.08);
-
-    border-top-color:
-        var(--accent-light);
-
-    border-radius: 50%;
-
-    animation:
-        spin 0.7s linear infinite;
-}
-
-
-/* =========================
-   ANIMATIONS
-========================= */
-
-@keyframes spin {
-
-    to {
-        transform: rotate(360deg);
-    }
-
-}
-
-@keyframes logoFloat {
-
-    0%,
-    100% {
-        transform: translateY(0);
-    }
-
-    50% {
-        transform: translateY(-8px);
-    }
-
-}
-
-@keyframes glowPulse {
-
-    0%,
-    100% {
-        opacity: 0.4;
-
-        transform: scale(0.9);
-    }
-
-    50% {
-        opacity: 0.8;
-
-        transform: scale(1.1);
-    }
-
-}
-
-@keyframes orbMove {
-
-    0%,
-    100% {
-        transform:
-            translate(0, 0);
-    }
-
-    50% {
-        transform:
-            translate(25px, 35px);
-    }
-
-}
-
-@keyframes pageEnter {
-
-    from {
-        opacity: 0;
-
-        transform:
-            translateY(12px);
-    }
-
-    to {
-        opacity: 1;
-
-        transform:
-            translateY(0);
-    }
-
-}
-
-@keyframes campaignEnter {
-
-    from {
-        opacity: 0;
-
-        transform:
-            translateY(15px)
-            scale(0.98);
-    }
-
-    to {
-        opacity: 1;
-
-        transform:
-            translateY(0)
-            scale(1);
-    }
-
-}
-
-
-/* =========================
-   SMALL PHONES
-========================= */
-
-@media (max-width: 360px) {
-
-    .brand h1 {
-        font-size: 45px;
-    }
-
-    .balance-card h1 {
-        font-size: 50px;
-    }
-
-    .promotion-options {
-        grid-template-columns: 1fr;
-    }
-
-}
-
-
-/* =========================
-   LARGE SCREENS
-========================= */
-
-@media (min-width: 700px) {
-
-    .app {
-        border-left: 1px solid var(--border);
-        border-right: 1px solid var(--border);
-    }
-
-}
-
+</html>
