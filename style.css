@@ -1,468 +1,1105 @@
-<!DOCTYPE html>
-<html lang="en">
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --background: #070910;
+    --surface: rgba(255, 255, 255, 0.055);
+    --surface-strong: rgba(255, 255, 255, 0.09);
+    --border: rgba(255, 255, 255, 0.09);
+    --text: #ffffff;
+    --muted: #9298aa;
+    --accent: #7c5cff;
+    --accent-light: #a892ff;
+}
 
-<head>
-    <meta charset="UTF-8">
+html,
+body {
+    min-height: 100%;
+}
+
+body {
+    background:
+        radial-gradient(circle at 90% 0%, rgba(124, 92, 255, 0.18), transparent 35%),
+        radial-gradient(circle at 0% 70%, rgba(77, 121, 255, 0.1), transparent 35%),
+        var(--background);
+
+    color: var(--text);
+    font-family: Arial, Helvetica, sans-serif;
+    overflow-x: hidden;
+}
+
+button,
+input,
+select {
+    font: inherit;
+}
+
+button {
+    border: none;
+    cursor: pointer;
+}
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+.hidden {
+    display: none !important;
+}
 
-    <title>PromoHub</title>
 
-    <link
-        rel="stylesheet"
-        href="style.css"
-    >
+/* =========================
+   LOADING SCREEN
+========================= */
 
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-</head>
+.loader-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
 
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-<body>
+    background:
+        radial-gradient(circle at center, rgba(124, 92, 255, 0.18), transparent 35%),
+        #070910;
 
-    <!-- =========================
-         LOGIN PAGE
-    ========================== -->
+    transition:
+        opacity 0.5s ease,
+        visibility 0.5s ease;
+}
 
-    <section
-        id="loginPage"
-        class="page login-page"
-    >
+.loader-screen.hide-loader {
+    opacity: 0;
+    visibility: hidden;
+}
 
-        <div class="logo">
-            🚀
-        </div>
+.loader-content {
+    width: 100%;
+    padding: 30px;
+    text-align: center;
+}
 
-        <h1>PromoHub</h1>
+.loader-logo {
+    position: relative;
 
-        <p class="subtitle">
-            Promote your Telegram community
-            and grow your audience.
-        </p>
+    width: 90px;
+    height: 90px;
 
+    margin: 0 auto 25px;
 
-        <button
-            id="loginButton"
-            class="primary-button"
-        >
-            Continue with Telegram
-        </button>
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
+    border: 1px solid var(--border);
+    border-radius: 28px;
 
-        <p class="small-text">
-            Secure access through Telegram
-        </p>
+    background: rgba(255, 255, 255, 0.06);
 
-    </section>
+    font-size: 42px;
 
+    animation: logoFloat 2.5s ease-in-out infinite;
+}
 
+.logo-glow {
+    position: absolute;
+    inset: -20px;
 
-    <!-- =========================
-         APP
-    ========================== -->
+    border-radius: 50%;
 
-    <main
-        id="app"
-        class="app hidden"
-    >
+    background: rgba(124, 92, 255, 0.3);
 
+    filter: blur(35px);
 
-        <!-- =========================
-             DASHBOARD
-        ========================== -->
+    z-index: -1;
 
-        <section
-            id="dashboardPage"
-            class="page"
-        >
+    animation: glowPulse 2s ease-in-out infinite;
+}
 
-            <header class="top-header">
+.loader-content h1 {
+    font-size: 32px;
+    letter-spacing: -1px;
+}
 
-                <div>
+.loader-content p {
+    color: var(--muted);
+    margin-top: 8px;
+}
 
-                    <p class="welcome-text">
-                        Welcome back
-                    </p>
+.spinner {
+    width: 48px;
+    height: 48px;
 
-                    <h2 id="userName">
-                        Telegram User
-                    </h2>
+    margin: 40px auto 20px;
+}
 
-                </div>
+.spinner-ring {
+    width: 100%;
+    height: 100%;
 
+    border: 3px solid rgba(255, 255, 255, 0.08);
+    border-top-color: var(--accent-light);
 
-                <button
-                    id="profileButton"
-                    class="avatar"
-                >
-                    👤
-                </button>
+    border-radius: 50%;
 
-            </header>
+    animation: spin 0.8s linear infinite;
+}
 
+.loading-text {
+    color: var(--muted);
+    font-size: 13px;
+}
 
 
-            <div class="hero-card">
+/* =========================
+   LOGIN
+========================= */
 
-                <p>
-                    Promotion Balance
-                </p>
+.login-page {
+    position: relative;
 
-                <h1 id="userBalance">
-                    0
-                </h1>
+    min-height: 100vh;
 
-                <span>
-                    Promotion credits
-                </span>
+    display: flex;
+    align-items: center;
 
-            </div>
+    padding:
+        max(30px, env(safe-area-inset-top))
+        25px
+        max(30px, env(safe-area-inset-bottom));
 
+    overflow: hidden;
+}
 
+.login-background {
+    position: absolute;
+    inset: 0;
 
-            <div class="stats-grid">
+    pointer-events: none;
+}
 
-                <div class="stat-card">
+.orb {
+    position: absolute;
 
-                    <span>
-                        🚀
-                    </span>
+    width: 280px;
+    height: 280px;
 
-                    <h3 id="campaignCount">
-                        0
-                    </h3>
+    border-radius: 50%;
 
-                    <p>
-                        Campaigns
-                    </p>
+    filter: blur(80px);
 
-                </div>
+    opacity: 0.3;
 
+    animation: orbMove 8s ease-in-out infinite;
+}
 
-                <div class="stat-card">
+.orb-one {
+    top: -80px;
+    right: -100px;
 
-                    <span>
-                        👥
-                    </span>
+    background: var(--accent);
+}
 
-                    <h3 id="totalReach">
-                        0
-                    </h3>
+.orb-two {
+    bottom: -100px;
+    left: -120px;
 
-                    <p>
-                        Total Reach
-                    </p>
+    background: #365cff;
 
-                </div>
+    animation-delay: -4s;
+}
 
-            </div>
+.login-content {
+    position: relative;
+    z-index: 2;
 
+    width: 100%;
+}
 
+.brand-icon {
+    width: 65px;
+    height: 65px;
 
-            <button
-                id="startPromotionButton"
-                class="primary-button"
-            >
-                🚀 Start Promotion
-            </button>
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
+    border-radius: 20px;
 
-            <div class="section-header">
+    background: linear-gradient(
+        135deg,
+        var(--accent),
+        #4d6fff
+    );
 
-                <h3>
-                    Recent Campaigns
-                </h3>
+    box-shadow: 0 20px 50px rgba(124, 92, 255, 0.3);
 
-            </div>
+    font-size: 30px;
 
+    margin-bottom: 35px;
+}
 
-            <div
-                id="recentCampaigns"
-                class="empty-state"
-            >
+.brand > span,
+.greeting,
+.section-title span,
+.page-heading > span,
+.stat-card > span,
+.balance-top > span,
+.form-card label {
+    color: var(--accent-light);
 
-                <span>
-                    📭
-                </span>
+    font-size: 11px;
+    font-weight: 700;
 
-                <p>
-                    No campaigns yet
-                </p>
+    letter-spacing: 1.8px;
+}
 
-            </div>
+.brand h1 {
+    margin-top: 12px;
 
-        </section>
+    font-size: clamp(48px, 14vw, 72px);
+    line-height: 0.92;
 
+    letter-spacing: -4px;
+}
 
+.brand h1 strong {
+    color: var(--accent-light);
+}
 
-        <!-- =========================
-             PROMOTE PAGE
-        ========================== -->
+.login-description {
+    max-width: 420px;
 
-        <section
-            id="promotePage"
-            class="page hidden"
-        >
+    margin: 30px 0;
 
-            <h2>
-                🚀 Create Promotion
-            </h2>
+    color: var(--muted);
 
+    font-size: 16px;
+    line-height: 1.6;
+}
 
-            <label>
-                Telegram Link
-            </label>
+.main-button {
+    width: 100%;
+    min-height: 58px;
 
-            <input
-                id="promotionLink"
-                type="url"
-                placeholder="https://t.me/yourgroup"
-            >
+    padding: 0 22px;
 
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 
-            <label>
-                Promotion Type
-            </label>
+    color: white;
 
+    border-radius: 18px;
 
-            <div class="option-grid">
+    background: linear-gradient(
+        135deg,
+        var(--accent),
+        #566dff
+    );
 
-                <button
-                    class="option-card active"
-                    data-type="reach"
-                >
+    font-weight: 700;
 
-                    📢
+    box-shadow: 0 18px 40px rgba(124, 92, 255, 0.25);
 
-                    <strong>
-                        Link Reach
-                    </strong>
+    transition:
+        transform 0.2s ease,
+        opacity 0.2s ease;
+}
 
-                    <small>
-                        Share your link
-                    </small>
+.main-button:active {
+    transform: scale(0.97);
+}
 
-                </button>
+.button-arrow {
+    font-size: 22px;
+}
 
+.secure-text {
+    margin-top: 18px;
 
-                <button
-                    class="option-card"
-                    data-type="members"
-                >
+    color: var(--muted);
 
-                    👥
+    font-size: 12px;
+    text-align: center;
+}
 
-                    <strong>
-                        Verified Joins
-                    </strong>
 
-                    <small>
-                        Track voluntary joins
-                    </small>
+/* =========================
+   APP
+========================= */
 
-                </button>
+.app {
+    width: 100%;
+    max-width: 600px;
 
-            </div>
+    min-height: 100vh;
 
+    margin: 0 auto;
 
+    padding-bottom: 110px;
+}
 
-            <label>
-                Promotion Amount
-            </label>
+.page {
+    min-height: 100vh;
 
+    padding:
+        max(25px, env(safe-area-inset-top))
+        20px
+        120px;
 
-            <select id="promotionAmount">
+    animation: pageEnter 0.35s ease;
+}
 
-                <option value="100">
-                    100 Reach
-                </option>
+.app-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 
-                <option value="500">
-                    500 Reach
-                </option>
+    margin-bottom: 28px;
+}
 
-                <option value="1000">
-                    1,000 Reach
-                </option>
+.app-header h2 {
+    margin-top: 5px;
 
-            </select>
+    font-size: 25px;
+    letter-spacing: -1px;
+}
 
+.user-avatar {
+    position: relative;
 
+    width: 50px;
+    height: 50px;
 
-            <button
-                id="createCampaignButton"
-                class="primary-button"
-            >
-                Create Campaign
-            </button>
+    border-radius: 17px;
 
-        </section>
+    color: white;
 
+    background: var(--surface-strong);
 
+    border: 1px solid var(--border);
 
-        <!-- =========================
-             CAMPAIGNS PAGE
-        ========================== -->
+    font-size: 22px;
+}
 
-        <section
-            id="campaignsPage"
-            class="page hidden"
-        >
+.online-dot {
+    position: absolute;
 
-            <h2>
-                📊 My Campaigns
-            </h2>
+    right: -1px;
+    bottom: 2px;
 
+    width: 12px;
+    height: 12px;
 
-            <div
-                id="campaignList"
-                class="empty-state"
-            >
+    border: 3px solid var(--background);
+    border-radius: 50%;
 
-                <span>
-                    📭
-                </span>
+    background: #4be38b;
+}
 
-                <p>
-                    You have no campaigns
-                </p>
 
-            </div>
+/* =========================
+   BALANCE
+========================= */
 
-        </section>
+.balance-card {
+    position: relative;
 
+    padding: 25px;
 
+    border: 1px solid rgba(168, 146, 255, 0.2);
+    border-radius: 28px;
 
-        <!-- =========================
-             PROFILE PAGE
-        ========================== -->
+    background:
+        linear-gradient(
+            145deg,
+            rgba(124, 92, 255, 0.25),
+            rgba(255, 255, 255, 0.04)
+        );
 
-        <section
-            id="profilePage"
-            class="page hidden"
-        >
+    overflow: hidden;
 
-            <div class="profile-card">
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25);
+}
 
-                <div class="profile-avatar">
-                    👤
-                </div>
+.card-glow {
+    position: absolute;
 
+    width: 180px;
+    height: 180px;
 
-                <h2 id="profileName">
-                    Telegram User
-                </h2>
+    right: -70px;
+    top: -80px;
 
+    border-radius: 50%;
 
-                <p id="profileUsername">
-                    @username
-                </p>
+    background: rgba(124, 92, 255, 0.4);
 
-            </div>
+    filter: blur(50px);
+}
 
+.balance-top {
+    position: relative;
 
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
 
-            <div class="profile-menu">
+.credit-icon {
+    font-size: 20px;
+}
 
-                <button>
-                    👥 Referral Program
-                </button>
+.balance-card h1 {
+    position: relative;
 
+    margin-top: 18px;
 
-                <button>
-                    👑 Premium
-                </button>
+    font-size: 58px;
+    letter-spacing: -4px;
+}
 
+.balance-card p {
+    position: relative;
 
-                <button>
-                    💬 Support
-                </button>
+    color: var(--muted);
 
+    margin-top: 3px;
+}
 
-                <button
-                    id="logoutButton"
-                    class="logout-button"
-                >
-                    🚪 Log Out
-                </button>
+.card-button {
+    position: relative;
 
-            </div>
+    width: 100%;
 
-        </section>
+    margin-top: 25px;
+    padding: 16px 18px;
 
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 
+    color: white;
 
-        <!-- =========================
-             BOTTOM NAVIGATION
-        ========================== -->
+    background: rgba(255, 255, 255, 0.1);
 
-        <nav class="bottom-nav">
+    border: 1px solid var(--border);
+    border-radius: 16px;
 
-            <button
-                class="nav-button active"
-                data-page="dashboardPage"
-            >
+    font-weight: 700;
 
-                🏠
+    backdrop-filter: blur(15px);
+}
 
-                <span>
-                    Home
-                </span>
 
-            </button>
+/* =========================
+   STATS
+========================= */
 
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
 
-            <button
-                class="nav-button"
-                data-page="promotePage"
-            >
+    gap: 12px;
 
-                🚀
+    margin-top: 14px;
+}
 
-                <span>
-                    Promote
-                </span>
+.stat-card {
+    padding: 20px;
 
-            </button>
+    border: 1px solid var(--border);
+    border-radius: 22px;
 
+    background: var(--surface);
 
-            <button
-                class="nav-button"
-                data-page="campaignsPage"
-            >
+    backdrop-filter: blur(20px);
+}
 
-                📊
+.stat-icon {
+    width: 40px;
+    height: 40px;
 
-                <span>
-                    Campaigns
-                </span>
+    margin-bottom: 20px;
 
-            </button>
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
+    border-radius: 13px;
 
-            <button
-                class="nav-button"
-                data-page="profilePage"
-            >
+    background: rgba(124, 92, 255, 0.13);
+}
 
-                👤
+.stat-card h2 {
+    margin: 8px 0 4px;
 
-                <span>
-                    Profile
-                </span>
+    font-size: 30px;
+}
 
-            </button>
+.stat-card small {
+    color: var(--muted);
+}
 
-        </nav>
 
+/* =========================
+   SECTIONS
+========================= */
 
-    </main>
+.section-title {
+    margin: 32px 2px 15px;
 
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+}
 
-    <script src="app.js"></script>
+.section-title h3 {
+    margin-top: 5px;
 
-</body>
+    font-size: 20px;
+}
 
-</html>
+.section-title button {
+    color: var(--accent-light);
+
+    background: transparent;
+
+    font-size: 13px;
+}
+
+.promote-action {
+    width: 100%;
+
+    padding: 18px;
+
+    display: flex;
+    align-items: center;
+
+    border: 1px solid var(--border);
+    border-radius: 22px;
+
+    color: white;
+
+    background: var(--surface);
+
+    text-align: left;
+
+    transition: transform 0.2s ease;
+}
+
+.promote-action:active {
+    transform: scale(0.98);
+}
+
+.action-icon {
+    width: 52px;
+    height: 52px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 17px;
+
+    background: linear-gradient(
+        135deg,
+        rgba(124, 92, 255, 0.25),
+        rgba(77, 111, 255, 0.15)
+    );
+
+    font-size: 23px;
+}
+
+.action-text {
+    flex: 1;
+
+    display: flex;
+    flex-direction: column;
+
+    margin-left: 15px;
+}
+
+.action-text span {
+    margin-top: 5px;
+
+    color: var(--muted);
+
+    font-size: 12px;
+}
+
+.action-arrow {
+    color: var(--accent-light);
+
+    font-size: 22px;
+}
+
+.empty-card {
+    min-height: 180px;
+
+    padding: 25px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px dashed var(--border);
+    border-radius: 24px;
+
+    background: rgba(255, 255, 255, 0.025);
+
+    text-align: center;
+}
+
+.empty-icon {
+    margin-bottom: 15px;
+
+    font-size: 32px;
+}
+
+.empty-card span {
+    margin-top: 7px;
+
+    color: var(--muted);
+
+    font-size: 13px;
+}
+
+
+/* =========================
+   PAGE HEADING
+========================= */
+
+.page-heading {
+    margin: 15px 0 30px;
+}
+
+.page-heading h1 {
+    margin: 8px 0;
+
+    font-size: 38px;
+    letter-spacing: -2px;
+}
+
+.page-heading p {
+    color: var(--muted);
+}
+
+
+/* =========================
+   FORM
+========================= */
+
+.form-card {
+    padding: 20px;
+
+    border: 1px solid var(--border);
+    border-radius: 25px;
+
+    background: var(--surface);
+
+    backdrop-filter: blur(20px);
+}
+
+.form-card label {
+    display: block;
+
+    margin: 22px 0 10px;
+}
+
+.form-card label:first-child {
+    margin-top: 0;
+}
+
+.input-box {
+    min-height: 58px;
+
+    padding: 0 16px;
+
+    display: flex;
+    align-items: center;
+
+    border: 1px solid var(--border);
+    border-radius: 17px;
+
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.input-box input,
+.input-box select {
+    width: 100%;
+
+    margin-left: 12px;
+
+    color: white;
+
+    border: none;
+    outline: none;
+
+    background: transparent;
+}
+
+.input-box select option {
+    color: black;
+}
+
+.promotion-options {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+
+    gap: 10px;
+}
+
+.promotion-option {
+    min-height: 145px;
+
+    padding: 18px 12px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+
+    color: white;
+
+    border: 1px solid var(--border);
+    border-radius: 20px;
+
+    background: rgba(255, 255, 255, 0.03);
+
+    text-align: left;
+}
+
+.promotion-option.selected {
+    border-color: var(--accent);
+
+    background: rgba(124, 92, 255, 0.13);
+
+    box-shadow:
+        inset 0 0 0 1px rgba(124, 92, 255, 0.2);
+}
+
+.option-icon {
+    margin-bottom: 15px;
+
+    font-size: 28px;
+}
+
+.promotion-option small {
+    margin-top: 6px;
+
+    color: var(--muted);
+}
+
+.form-card .main-button {
+    margin-top: 25px;
+}
+
+
+/* =========================
+   PROFILE
+========================= */
+
+.profile-header {
+    padding: 35px 20px;
+
+    text-align: center;
+}
+
+.large-avatar {
+    width: 90px;
+    height: 90px;
+
+    margin: 0 auto 18px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid var(--border);
+    border-radius: 30px;
+
+    background: linear-gradient(
+        135deg,
+        rgba(124, 92, 255, 0.3),
+        rgba(77, 111, 255, 0.1)
+    );
+
+    font-size: 40px;
+
+    box-shadow: 0 20px 50px rgba(124, 92, 255, 0.15);
+}
+
+.profile-header h2 {
+    font-size: 27px;
+}
+
+.profile-header > span {
+    display: block;
+
+    margin-top: 7px;
+
+    color: var(--muted);
+}
+
+.profile-options {
+    display: flex;
+    flex-direction: column;
+
+    gap: 10px;
+}
+
+.profile-options button {
+    width: 100%;
+
+    padding: 17px;
+
+    display: flex;
+    align-items: center;
+
+    color: white;
+
+    border: 1px solid var(--border);
+    border-radius: 19px;
+
+    background: var(--surface);
+
+    text-align: left;
+}
+
+.profile-options button > span {
+    width: 45px;
+    height: 45px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 14px;
+
+    background: rgba(124, 92, 255, 0.12);
+
+    font-size: 20px;
+}
+
+.profile-options button div {
+    flex: 1;
+
+    display: flex;
+    flex-direction: column;
+
+    margin-left: 13px;
+}
+
+.profile-options button small {
+    margin-top: 5px;
+
+    color: var(--muted);
+}
+
+.profile-options button b {
+    color: var(--muted);
+
+    font-size: 20px;
+}
+
+.logout-option strong {
+    color: #ff7b86;
+}
+
+
+/* =========================
+   BOTTOM NAV
+========================= */
+
+.bottom-navigation {
+    position: fixed;
+
+    left: 50%;
+    bottom: 0;
+
+    z-index: 100;
+
+    width: 100%;
+    max-width: 600px;
+
+    padding:
+        10px
+        15px
+        max(10px, env(safe-area-inset-bottom));
+
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+
+    transform: translateX(-50%);
+
+    border-top: 1px solid var(--border);
+
+    background: rgba(7, 9, 16, 0.88);
+
+    backdrop-filter: blur(25px);
+}
+
+.nav-button {
+    min-height: 55px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    color: var(--muted);
+
+    background: transparent;
+
+    gap: 5px;
+}
+
+.nav-button > span {
+    font-size: 21px;
+
+    transition: transform 0.2s ease;
+}
+
+.nav-button small {
+    font-size: 10px;
+}
+
+.nav-button.active {
+    color: var(--accent-light);
+}
+
+.nav-button.active > span {
+    transform: translateY(-2px);
+}
+
+
+/* =========================
+   ACTION LOADER
+========================= */
+
+.action-loader {
+    position: fixed;
+    inset: 0;
+
+    z-index: 9998;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    gap: 18px;
+
+    background: rgba(7, 9, 16, 0.85);
+
+    backdrop-filter: blur(15px);
+}
+
+.mini-spinner {
+    width: 45px;
+    height: 45px;
+
+    border: 3px solid rgba(255, 255, 255, 0.08);
+    border-top-color: var(--accent-light);
+
+    border-radius: 50%;
+
+    animation: spin 0.7s linear infinite;
+}
+
+
+/* =========================
+   ANIMATIONS
+========================= */
+
+@keyframes spin {
+
+    to {
+        transform: rotate(360deg);
+    }
+
+}
+
+@keyframes logoFloat {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-8px);
+    }
+
+}
+
+@keyframes glowPulse {
+
+    0%,
+    100% {
+        opacity: 0.4;
+        transform: scale(0.9);
+    }
+
+    50% {
+        opacity: 0.8;
+        transform: scale(1.1);
+    }
+
+}
+
+@keyframes orbMove {
+
+    0%,
+    100% {
+        transform: translate(0, 0);
+    }
+
+    50% {
+        transform: translate(25px, 35px);
+    }
+
+}
+
+@keyframes pageEnter {
+
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+}
+
+
+/* =========================
+   SMALL PHONES
+========================= */
+
+@media (max-width: 360px) {
+
+    .brand h1 {
+        font-size: 45px;
+    }
+
+    .balance-card h1 {
+        font-size: 50px;
+    }
+
+    .promotion-options {
+        grid-template-columns: 1fr;
+    }
+
+}
