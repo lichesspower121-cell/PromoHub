@@ -2,7 +2,7 @@
 
 // IMPORTANT: replace this after deploying server.py.
 // Example: https://your-promohub-api.onrender.com
-const API_BASE_URL = "https://YOUR-BACKEND-URL";
+const API_BASE_URL = "https://promohub-backend-fkvo.onrender.com";
 
 const tg = window.Telegram && window.Telegram.WebApp
   ? window.Telegram.WebApp
