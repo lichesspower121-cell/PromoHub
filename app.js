@@ -1,1004 +1,399 @@
-// =========================
-// TELEGRAM MINI APP
-// =========================
+"use strict";
 
-const tg = window.Telegram?.WebApp;
+// IMPORTANT: replace this after deploying server.py.
+// Example: https://your-promohub-api.onrender.com
+const API_BASE_URL = "https://YOUR-BACKEND-URL";
+
+const tg = window.Telegram && window.Telegram.WebApp
+  ? window.Telegram.WebApp
+  : null;
 
 if (tg) {
-    tg.ready();
-    tg.expand();
+  tg.ready();
+  tg.expand();
 }
 
+const $ = (id) => document.getElementById(id);
 
-// =========================
-// ELEMENTS
-// =========================
-
-const loader = document.getElementById("loader");
-const loadingText = document.getElementById("loadingText");
-
-const loginPage = document.getElementById("loginPage");
-const app = document.getElementById("app");
-
-const loginButton = document.getElementById("loginButton");
-const logoutButton = document.getElementById("logoutButton");
-
-const actionLoader = document.getElementById("actionLoader");
-const actionLoaderText = document.getElementById("actionLoaderText");
-
-const userName = document.getElementById("userName");
-const profileName = document.getElementById("profileName");
-const profileUsername = document.getElementById("profileUsername");
-
-const profileButton = document.getElementById("profileButton");
-
-const startPromotionButton = document.getElementById(
-    "startPromotionButton"
-);
-
-const quickPromoteButton = document.getElementById(
-    "quickPromoteButton"
-);
-
-const viewCampaignsButton = document.getElementById(
-    "viewCampaignsButton"
-);
-
-const createCampaignButton = document.getElementById(
-    "createCampaignButton"
-);
-
-const promotionLink = document.getElementById("promotionLink");
-const promotionAmount = document.getElementById("promotionAmount");
-
-
-// =========================
-// APP DATA
-// =========================
+const loader = $("loader");
+const loadingText = $("loadingText");
+const loginPage = $("loginPage");
+const app = $("app");
+const loginButton = $("loginButton");
+const logoutButton = $("logoutButton");
+const actionLoader = $("actionLoader");
+const actionLoaderText = $("actionLoaderText");
+const userName = $("userName");
+const profileName = $("profileName");
+const profileUsername = $("profileUsername");
+const profileButton = $("profileButton");
+const startPromotionButton = $("startPromotionButton");
+const quickPromoteButton = $("quickPromoteButton");
+const viewCampaignsButton = $("viewCampaignsButton");
+const createCampaignButton = $("createCampaignButton");
+const promotionLink = $("promotionLink");
+const promotionAmount = $("promotionAmount");
+const usersTargetBox = $("usersTargetBox");
+const groupTargetBox = $("groupTargetBox");
+const campaignCost = $("campaignCost");
+const formMessage = $("formMessage");
+const campaignCount = $("campaignCount");
+const totalReach = $("totalReach");
+const campaignList = $("campaignList");
+const recentCampaigns = $("recentCampaigns");
+const creditBalance = $("creditBalance");
+const profileCredits = $("profileCredits");
 
 let currentUser = null;
-let promotionType = "reach";
-
 let campaigns = [];
+let promotionType = "users";
+let credits = 100;
 
+const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-// =========================
-// LOADING SCREEN
-// =========================
+function getTelegramUser() {
+  try {
+    const user = tg?.initDataUnsafe?.user;
+    if (!user) return null;
 
-function wait(ms) {
-
-    return new Promise(resolve => {
-
-        setTimeout(resolve, ms);
-
-    });
-
+    return {
+      id: String(user.id),
+      firstName: user.first_name || "Telegram User",
+      lastName: user.last_name || "",
+      username: user.username || ""
+    };
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
 }
 
+function campaignKey() {
+  return `promohub_campaigns_${currentUser.id}`;
+}
+
+function creditKey() {
+  return `promohub_credits_${currentUser.id}`;
+}
 
 async function startApp() {
+  loadingText.textContent = "Connecting to Telegram...";
+  await wait(500);
 
-    loadingText.textContent =
-        "Connecting to Telegram...";
+  currentUser = getTelegramUser();
 
-    await wait(900);
+  loadingText.textContent = "Loading PromoHub...";
+  await wait(500);
 
+  loader.classList.add("hidden");
 
-    loadingText.textContent =
-        "Loading account...";
-
-    await wait(800);
-
-
-    loadTelegramUser();
-
-    loadCampaigns();
-
-
-    loadingText.textContent =
-        "Ready";
-
-    await wait(500);
-
-
-    loader.classList.add("hide-loader");
-
-    await wait(500);
-
-
-    loader.classList.add("hidden");
-
-
-    checkLogin();
-
+  if (currentUser) {
+    openApp();
+  } else {
+    showLogin();
+  }
 }
-
-
-startApp();
-
-
-// =========================
-// TELEGRAM USER
-// =========================
-
-function loadTelegramUser() {
-
-    try {
-
-        if (
-            tg &&
-            tg.initDataUnsafe &&
-            tg.initDataUnsafe.user
-        ) {
-
-            const telegramUser =
-                tg.initDataUnsafe.user;
-
-
-            currentUser = {
-
-                id: telegramUser.id,
-
-                firstName:
-                    telegramUser.first_name ||
-                    "Telegram User",
-
-                lastName:
-                    telegramUser.last_name ||
-                    "",
-
-                username:
-                    telegramUser.username ||
-                    ""
-
-            };
-
-
-            localStorage.setItem(
-                "promoUser",
-                JSON.stringify(currentUser)
-            );
-
-        }
-
-    }
-
-    catch (error) {
-
-        console.log(
-            "Telegram user error:",
-            error
-        );
-
-    }
-
-}
-
-
-// =========================
-// CHECK LOGIN
-// =========================
-
-function checkLogin() {
-
-    const savedUser =
-        localStorage.getItem("promoUser");
-
-
-    if (savedUser) {
-
-        try {
-
-            currentUser =
-                JSON.parse(savedUser);
-
-
-            openApp();
-
-        }
-
-        catch (error) {
-
-            localStorage.removeItem(
-                "promoUser"
-            );
-
-
-            showLogin();
-
-        }
-
-    }
-
-    else {
-
-        showLogin();
-
-    }
-
-}
-
-
-// =========================
-// SHOW LOGIN
-// =========================
 
 function showLogin() {
-
-    app.classList.add("hidden");
-
-    loginPage.classList.remove("hidden");
-
+  app.classList.add("hidden");
+  loginPage.classList.remove("hidden");
 }
-
-
-// =========================
-// OPEN APP
-// =========================
 
 function openApp() {
-
-    loginPage.classList.add("hidden");
-
-    app.classList.remove("hidden");
-
-
-    updateUserUI();
-
-    updateCampaignUI();
-
-    openPage("dashboardPage");
-
+  loginPage.classList.add("hidden");
+  app.classList.remove("hidden");
+  loadUserData();
+  updateUserUI();
+  updateCampaignUI();
+  updatePromotionUI();
+  openPage("dashboardPage");
 }
 
-
-// =========================
-// LOGIN
-// =========================
-
-loginButton.addEventListener(
-    "click",
-    async function () {
-
-        showActionLoader(
-            "Connecting your account..."
-        );
-
-
-        await wait(1000);
-
-
-        loadTelegramUser();
-
-
-        if (!currentUser) {
-
-            hideActionLoader();
-
-
-            alert(
-                "Please open PromoHub inside Telegram."
-            );
-
-
-            return;
-
-        }
-
-
-        localStorage.setItem(
-            "promoUser",
-            JSON.stringify(currentUser)
-        );
-
-
-        await wait(500);
-
-
-        hideActionLoader();
-
-        openApp();
-
-    }
-);
-
-
-// =========================
-// LOGOUT
-// =========================
-
-logoutButton.addEventListener(
-    "click",
-    async function () {
-
-        showActionLoader(
-            "Logging out..."
-        );
-
-
-        await wait(800);
-
-
-        localStorage.removeItem(
-            "promoUser"
-        );
-
-
-        currentUser = null;
-
-
-        hideActionLoader();
-
-        showLogin();
-
-    }
-);
-
-
-// =========================
-// USER UI
-// =========================
-
-function updateUserUI() {
-
-    if (!currentUser) {
-        return;
-    }
-
-
-    const fullName = (
-
-        currentUser.firstName +
-
-        " " +
-
-        currentUser.lastName
-
-    ).trim();
-
-
-    userName.textContent =
-        fullName;
-
-
-    profileName.textContent =
-        fullName;
-
-
-    if (currentUser.username) {
-
-        profileUsername.textContent =
-            "@" + currentUser.username;
-
-    }
-
-    else {
-
-        profileUsername.textContent =
-            "Telegram ID: " +
-            currentUser.id;
-
-    }
-
-}
-
-
-// =========================
-// PAGE NAVIGATION
-// =========================
-
-function openPage(pageId) {
-
-    const pages =
-        document.querySelectorAll(".page");
-
-
-    pages.forEach(page => {
-
-        page.classList.add("hidden");
-
-    });
-
-
-    const selectedPage =
-        document.getElementById(pageId);
-
-
-    if (selectedPage) {
-
-        selectedPage.classList.remove(
-            "hidden"
-        );
-
-    }
-
-
-    const navButtons =
-        document.querySelectorAll(
-            ".nav-button"
-        );
-
-
-    navButtons.forEach(button => {
-
-        button.classList.remove("active");
-
-
-        if (
-            button.dataset.page === pageId
-        ) {
-
-            button.classList.add("active");
-
-        }
-
-    });
-
-
-    window.scrollTo({
-
-        top: 0,
-
-        behavior: "smooth"
-
-    });
-
-}
-
-
-document
-    .querySelectorAll(".nav-button")
-    .forEach(button => {
-
-        button.addEventListener(
-            "click",
-            function () {
-
-                openPage(
-                    this.dataset.page
-                );
-
-            }
-        );
-
-    });
-
-
-// =========================
-// QUICK NAVIGATION
-// =========================
-
-profileButton.addEventListener(
-    "click",
-    function () {
-
-        openPage("profilePage");
-
-    }
-);
-
-
-startPromotionButton.addEventListener(
-    "click",
-    function () {
-
-        openPage("promotePage");
-
-    }
-);
-
-
-quickPromoteButton.addEventListener(
-    "click",
-    function () {
-
-        openPage("promotePage");
-
-    }
-);
-
-
-viewCampaignsButton.addEventListener(
-    "click",
-    function () {
-
-        openPage("campaignsPage");
-
-    }
-);
-
-
-// =========================
-// PROMOTION TYPE
-// =========================
-
-const promotionOptions =
-    document.querySelectorAll(
-        ".promotion-option"
-    );
-
-
-promotionOptions.forEach(option => {
-
-    option.addEventListener(
-        "click",
-        function () {
-
-            promotionOptions.forEach(
-                item => {
-
-                    item.classList.remove(
-                        "selected"
-                    );
-
-                }
-            );
-
-
-            this.classList.add(
-                "selected"
-            );
-
-
-            promotionType =
-                this.dataset.type;
-
-        }
-    );
-
+loginButton.addEventListener("click", () => {
+  currentUser = getTelegramUser();
+
+  if (!currentUser) {
+    alert("Open this website from the Telegram Mini App button.");
+    return;
+  }
+
+  openApp();
 });
 
+logoutButton.addEventListener("click", () => {
+  currentUser = null;
+  showLogin();
+});
 
-// =========================
-// CREATE CAMPAIGN
-// =========================
+function loadUserData() {
+  try {
+    campaigns = JSON.parse(localStorage.getItem(campaignKey()) || "[]");
+  } catch {
+    campaigns = [];
+  }
 
-createCampaignButton.addEventListener(
-    "click",
-    async function () {
+  const savedCredits = localStorage.getItem(creditKey());
+  credits = savedCredits === null ? 100 : Number(savedCredits);
 
-        const link =
-            promotionLink.value.trim();
-
-
-        const amount =
-            parseInt(
-                promotionAmount.value
-            );
-
-
-        if (!link) {
-
-            alert(
-                "Please enter your Telegram link."
-            );
-
-            return;
-
-        }
-
-
-        if (
-            !link.startsWith(
-                "https://t.me/"
-            )
-        ) {
-
-            alert(
-                "Please enter a valid Telegram link."
-            );
-
-            return;
-
-        }
-
-
-        showActionLoader(
-            "Creating campaign..."
-        );
-
-
-        await wait(1200);
-
-
-        const campaign = {
-
-            id:
-                Date.now(),
-
-            link:
-                link,
-
-            type:
-                promotionType,
-
-            amount:
-                amount,
-
-            delivered:
-                0,
-
-            status:
-                "Active",
-
-            created:
-                new Date().toISOString()
-
-        };
-
-
-        campaigns.unshift(
-            campaign
-        );
-
-
-        saveCampaigns();
-
-
-        promotionLink.value = "";
-
-
-        hideActionLoader();
-
-
-        updateCampaignUI();
-
-
-        openPage(
-            "campaignsPage"
-        );
-
-    }
-);
-
-
-// =========================
-// SAVE CAMPAIGNS
-// =========================
+  if (!Number.isFinite(credits)) credits = 100;
+  saveCredits();
+}
 
 function saveCampaigns() {
-
-    if (!currentUser) {
-        return;
-    }
-
-
-    localStorage.setItem(
-
-        "promoCampaigns_" +
-        currentUser.id,
-
-        JSON.stringify(campaigns)
-
-    );
-
+  localStorage.setItem(campaignKey(), JSON.stringify(campaigns));
 }
 
-
-// =========================
-// LOAD CAMPAIGNS
-// =========================
-
-function loadCampaigns() {
-
-    const savedUser =
-        localStorage.getItem(
-            "promoUser"
-        );
-
-
-    if (!savedUser) {
-
-        campaigns = [];
-
-        return;
-
-    }
-
-
-    try {
-
-        const user =
-            JSON.parse(savedUser);
-
-
-        const savedCampaigns =
-            localStorage.getItem(
-
-                "promoCampaigns_" +
-                user.id
-
-            );
-
-
-        if (savedCampaigns) {
-
-            campaigns =
-                JSON.parse(
-                    savedCampaigns
-                );
-
-        }
-
-        else {
-
-            campaigns = [];
-
-        }
-
-    }
-
-    catch (error) {
-
-        campaigns = [];
-
-    }
-
+function saveCredits() {
+  localStorage.setItem(creditKey(), String(credits));
 }
 
+function updateUserUI() {
+  if (!currentUser) return;
 
-// =========================
-// CAMPAIGN UI
-// =========================
+  const fullName = `${currentUser.firstName} ${currentUser.lastName}`.trim();
 
-function updateCampaignUI() {
+  userName.textContent = fullName;
+  profileName.textContent = fullName;
+  profileUsername.textContent = currentUser.username
+    ? `@${currentUser.username}`
+    : `Telegram ID: ${currentUser.id}`;
 
-    loadCampaigns();
+  creditBalance.textContent = credits;
+  profileCredits.textContent = `${credits} credits`;
+}
 
+function openPage(pageId) {
+  document.querySelectorAll(".page").forEach((page) => page.classList.add("hidden"));
+  $(pageId)?.classList.remove("hidden");
 
-    const campaignCount =
-        document.getElementById(
-            "campaignCount"
-        );
+  document.querySelectorAll(".nav-button").forEach((button) => {
+    button.classList.toggle("active", button.dataset.page === pageId);
+  });
 
+  window.scrollTo(0, 0);
+}
 
-    const totalReach =
-        document.getElementById(
-            "totalReach"
-        );
+document.querySelectorAll(".nav-button").forEach((button) => {
+  button.addEventListener("click", () => openPage(button.dataset.page));
+});
 
+profileButton.addEventListener("click", () => openPage("profilePage"));
+startPromotionButton.addEventListener("click", () => openPage("promotePage"));
+quickPromoteButton.addEventListener("click", () => openPage("promotePage"));
+viewCampaignsButton.addEventListener("click", () => openPage("campaignsPage"));
 
-    const campaignList =
-        document.getElementById(
-            "campaignList"
-        );
+document.querySelectorAll(".promotion-option").forEach((option) => {
+  option.addEventListener("click", () => {
+    document.querySelectorAll(".promotion-option")
+      .forEach((item) => item.classList.remove("selected"));
 
+    option.classList.add("selected");
+    promotionType = option.dataset.type;
+    updatePromotionUI();
+  });
+});
 
-    const recentCampaigns =
-        document.getElementById(
-            "recentCampaigns"
-        );
+promotionAmount.addEventListener("change", updatePromotionUI);
 
+function updatePromotionUI() {
+  const isUsers = promotionType === "users";
 
-    campaignCount.textContent =
-        campaigns.length;
+  usersTargetBox.classList.toggle("hidden", !isUsers);
+  groupTargetBox.classList.toggle("hidden", isUsers);
 
+  campaignCost.textContent = isUsers
+    ? String(Number(promotionAmount.value))
+    : "10";
+}
 
-    const reach =
-        campaigns.reduce(
+function isTelegramLink(link) {
+  try {
+    const url = new URL(link);
+    return url.protocol === "https:" &&
+      (url.hostname === "t.me" || url.hostname === "telegram.me");
+  } catch {
+    return false;
+  }
+}
 
-            (total, campaign) => {
+createCampaignButton.addEventListener("click", async () => {
+  clearMessage();
 
-                return total +
-                    Number(
-                        campaign.delivered || 0
-                    );
+  const link = promotionLink.value.trim();
 
-            },
+  if (!isTelegramLink(link)) {
+    showMessage("Enter a valid https://t.me/... link.", "error");
+    promotionLink.focus();
+    return;
+  }
 
-            0
+  if (API_BASE_URL.includes("YOUR-BACKEND-URL")) {
+    showMessage("Set API_BASE_URL in app.js after deploying server.py.", "error");
+    return;
+  }
 
-        );
+  const amount = promotionType === "users"
+    ? Number(promotionAmount.value)
+    : 1;
 
+  const cost = promotionType === "users"
+    ? amount
+    : 10;
 
-    totalReach.textContent =
-        reach;
+  if (credits < cost) {
+    showMessage(`You need ${cost} credits for this campaign.`, "error");
+    return;
+  }
 
+  showActionLoader("Creating campaign...");
 
-    if (campaigns.length === 0) {
+  try {
+    let result;
 
-        campaignList.innerHTML = `
-
-            <div class="empty-icon">
-                📊
-            </div>
-
-            <strong>
-                No campaigns
-            </strong>
-
-            <span>
-                Your campaigns will appear here
-            </span>
-
-        `;
-
-
-        recentCampaigns.innerHTML = `
-
-            <div class="empty-icon">
-                📭
-            </div>
-
-            <strong>
-                No campaigns yet
-            </strong>
-
-            <span>
-                Start your first promotion campaign
-            </span>
-
-        `;
-
-
-        return;
-
+    if (promotionType === "groups") {
+      result = await postGroupPromotion(link);
+    } else {
+      // Users mode creates a campaign target only.
+      // It does not mass-message Telegram users.
+      result = {
+        success: true,
+        message: `User campaign created for ${amount} users`
+      };
     }
 
+    if (!result.success) {
+      throw new Error(result.error || "Campaign failed");
+    }
 
-    campaignList.innerHTML = "";
+    credits -= cost;
 
-
-    campaigns.forEach(campaign => {
-
-        const card =
-            createCampaignCard(
-                campaign
-            );
-
-
-        campaignList.appendChild(
-            card
-        );
-
+    campaigns.unshift({
+      id: Date.now(),
+      link,
+      type: promotionType,
+      amount,
+      cost,
+      destination: promotionType === "groups"
+        ? "@giveawayforall2"
+        : `${amount} users`,
+      status: promotionType === "groups" ? "Posted" : "Created",
+      created: new Date().toISOString()
     });
 
+    saveCampaigns();
+    saveCredits();
+    promotionLink.value = "";
+    updateUserUI();
+    updateCampaignUI();
 
-    recentCampaigns.innerHTML = "";
+    hideActionLoader();
+    showMessage(result.message || "Campaign created.", "success");
+    openPage("campaignsPage");
+  } catch (error) {
+    hideActionLoader();
+    showMessage(error.message || "Campaign failed.", "error");
+  }
+});
 
+async function postGroupPromotion(link) {
+  if (!tg?.initData) {
+    return {
+      success: false,
+      error: "Open PromoHub inside Telegram before posting."
+    };
+  }
 
-    campaigns
-        .slice(0, 2)
-        .forEach(campaign => {
+  const response = await fetch(`${API_BASE_URL}/api/promote/group`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Telegram-Init-Data": tg.initData
+    },
+    body: JSON.stringify({ link })
+  });
 
-            const card =
-                createCampaignCard(
-                    campaign
-                );
+  const data = await response.json().catch(() => ({
+    success: false,
+    error: "Invalid server response"
+  }));
 
+  if (!response.ok) {
+    return {
+      success: false,
+      error: data.error || "Server rejected the campaign"
+    };
+  }
 
-            recentCampaigns.appendChild(
-                card
-            );
-
-        });
-
+  return data;
 }
 
+function updateCampaignUI() {
+  campaignCount.textContent = campaigns.length;
 
-// =========================
-// CREATE CAMPAIGN CARD
-// =========================
+  totalReach.textContent = campaigns.reduce((total, campaign) => {
+    return total + Number(campaign.amount || 0);
+  }, 0);
+
+  campaignList.innerHTML = "";
+  recentCampaigns.innerHTML = "";
+
+  campaigns.forEach((campaign) => {
+    campaignList.appendChild(createCampaignCard(campaign));
+  });
+
+  campaigns.slice(0, 2).forEach((campaign) => {
+    recentCampaigns.appendChild(createCampaignCard(campaign));
+  });
+}
 
 function createCampaignCard(campaign) {
+  const card = document.createElement("article");
+  card.className = "campaign-card";
 
-    const card =
-        document.createElement("div");
+  const title = campaign.type === "groups"
+    ? "📢 Group Promotion"
+    : "👥 User Campaign";
 
+  card.innerHTML = `
+    <div class="campaign-top">
+      <div>
+        <strong>${title}</strong>
+        <span>${escapeHTML(campaign.link)}</span>
+      </div>
+      <b>${escapeHTML(campaign.status || "Created")}</b>
+    </div>
+    <div class="campaign-meta">
+      Destination: ${escapeHTML(campaign.destination || "Unknown")}
+      · Cost: ${Number(campaign.cost || 0)} credits
+    </div>
+  `;
 
-    card.className =
-        "campaign-card";
-
-
-    const progress = Math.min(
-
-        100,
-
-        Math.round(
-
-            (
-                Number(
-                    campaign.delivered
-                )
-                /
-
-                Number(
-                    campaign.amount
-                )
-
-            ) * 100
-
-        )
-
-    );
-
-
-    card.innerHTML = `
-
-        <div class="campaign-top">
-
-            <div>
-
-                <strong>
-                    ${
-                        campaign.type === "joins"
-                        ? "👥 Verified Joins"
-                        : "📢 Link Reach"
-                    }
-                </strong>
-
-                <span>
-                    ${campaign.link}
-                </span>
-
-            </div>
-
-
-            <b>
-                ${campaign.status}
-            </b>
-
-        </div>
-
-
-        <div class="campaign-progress">
-
-            <div class="progress-info">
-
-                <span>
-                    Progress
-                </span>
-
-                <strong>
-                    ${campaign.delivered}
-                    /
-                    ${campaign.amount}
-                </strong>
-
-            </div>
-
-
-            <div class="progress-bar">
-
-                <div
-                    class="progress-fill"
-                    style="width: ${progress}%"
-                ></div>
-
-            </div>
-
-        </div>
-
-    `;
-
-
-    return card;
-
+  return card;
 }
 
-
-// =========================
-// ACTION LOADER
-// =========================
+function escapeHTML(value) {
+  const element = document.createElement("div");
+  element.textContent = String(value);
+  return element.innerHTML;
+}
 
 function showActionLoader(text) {
-
-    actionLoaderText.textContent =
-        text || "Processing...";
-
-
-    actionLoader.classList.remove(
-        "hidden"
-    );
-
+  actionLoaderText.textContent = text || "Processing...";
+  actionLoader.classList.remove("hidden");
 }
-
 
 function hideActionLoader() {
-
-    actionLoader.classList.add(
-        "hidden"
-    );
-
+  actionLoader.classList.add("hidden");
 }
+
+function showMessage(text, type) {
+  formMessage.textContent = text;
+  formMessage.className = `form-message ${type || ""}`;
+}
+
+function clearMessage() {
+  formMessage.textContent = "";
+  formMessage.className = "form-message";
+}
+
+startApp();

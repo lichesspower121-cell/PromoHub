@@ -1,821 +1,181 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0, viewport-fit=cover"
-    >
-
-    <meta
-        name="theme-color"
-        content="#080b14"
-    >
-
-    <title>PromoHub</title>
-
-    <link
-        rel="stylesheet"
-        href="style.css"
-    >
-
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#070910">
+  <title>PromoHub</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link rel="stylesheet" href="./style.css">
 </head>
-
-
 <body>
-
-
-    <!-- =========================
-         LOADING SCREEN
-    ========================== -->
-
-    <div id="loader" class="loader-screen">
-
-        <div class="loader-content">
-
-            <div class="loader-logo">
-
-                <div class="logo-glow"></div>
-
-                <span>
-                    🚀
-                </span>
-
-            </div>
-
-
-            <h1>
-                PromoHub
-            </h1>
-
-            <p>
-                Grow your Telegram community
-            </p>
-
-
-            <div class="spinner">
-
-                <div class="spinner-ring"></div>
-
-            </div>
-
-
-            <span
-                id="loadingText"
-                class="loading-text"
-            >
-                Connecting to Telegram...
-            </span>
-
-        </div>
-
+  <div id="loader" class="loader-screen">
+    <div class="loader-content">
+      <div class="loader-logo">🚀</div>
+      <h1>PromoHub</h1>
+      <p>Promotion made simple.</p>
+      <div class="spinner"></div>
+      <span id="loadingText">Starting PromoHub...</span>
     </div>
+  </div>
 
+  <main id="loginPage" class="login-page hidden">
+    <div class="orb orb-one"></div>
+    <div class="orb orb-two"></div>
+    <div class="login-content">
+      <div class="brand-icon">🚀</div>
+      <span class="eyebrow">TELEGRAM PROMOTION</span>
+      <h1>Promo<span>Hub.</span></h1>
+      <p>Promote Telegram links and communities from one clean dashboard.</p>
+      <button id="loginButton" class="primary-button">
+        <span>Continue with Telegram</span><span>→</span>
+      </button>
+      <small>🔒 Open this page from your Telegram Mini App.</small>
+    </div>
+  </main>
 
-
-    <!-- =========================
-         LOGIN
-    ========================== -->
-
-    <section
-        id="loginPage"
-        class="login-page hidden"
-    >
-
-        <div class="login-background">
-
-            <div class="orb orb-one"></div>
-
-            <div class="orb orb-two"></div>
-
+  <main id="app" class="app hidden">
+    <section id="dashboardPage" class="page">
+      <header class="app-header">
+        <div>
+          <span class="eyebrow">WELCOME BACK</span>
+          <h2 id="userName">Telegram User</h2>
         </div>
+        <button id="profileButton" class="avatar">👤</button>
+      </header>
 
+      <div class="hero-card">
+        <span class="eyebrow">PROMOTION CREDITS</span>
+        <h1 id="creditBalance">100</h1>
+        <p>Available credits</p>
+        <button id="startPromotionButton" class="glass-button">
+          <span>Start Promotion</span><span>→</span>
+        </button>
+      </div>
 
-        <div class="login-content">
+      <div class="stats-grid">
+        <article class="stat-card">
+          <span>📢</span><small>CAMPAIGNS</small>
+          <h2 id="campaignCount">0</h2>
+        </article>
+        <article class="stat-card">
+          <span>📈</span><small>TARGET REACH</small>
+          <h2 id="totalReach">0</h2>
+        </article>
+      </div>
 
-            <div class="brand-icon">
-                🚀
-            </div>
+      <div class="section-heading">
+        <div><span class="eyebrow">QUICK ACTION</span><h3>Promote a link</h3></div>
+      </div>
 
+      <button id="quickPromoteButton" class="action-card">
+        <span class="action-icon">🚀</span>
+        <span class="action-copy"><strong>New Promotion</strong><small>Create a new campaign</small></span>
+        <b>→</b>
+      </button>
 
-            <div class="brand">
-
-                <span>
-                    PROMOHUB
-                </span>
-
-                <h1>
-                    Promote.
-                    <br>
-                    Reach.
-                    <br>
-                    <strong>Grow.</strong>
-                </h1>
-
-            </div>
-
-
-            <p class="login-description">
-                The smarter way to promote your
-                Telegram community and track your growth.
-            </p>
-
-
-            <button
-                id="loginButton"
-                class="main-button"
-            >
-
-                <span>
-                    Continue with Telegram
-                </span>
-
-                <span class="button-arrow">
-                    →
-                </span>
-
-            </button>
-
-
-            <p class="secure-text">
-                🔒 Secure Telegram authentication
-            </p>
-
-        </div>
-
+      <div class="section-heading">
+        <div><span class="eyebrow">ACTIVITY</span><h3>Recent Campaigns</h3></div>
+        <button id="viewCampaignsButton">View all</button>
+      </div>
+      <div id="recentCampaigns" class="campaign-container"></div>
     </section>
 
-
-
-    <!-- =========================
-         MAIN APP
-    ========================== -->
-
-    <main
-        id="app"
-        class="app hidden"
-    >
-
-
-        <!-- =========================
-             DASHBOARD
-        ========================== -->
-
-        <section
-            id="dashboardPage"
-            class="page active-page"
-        >
-
-            <header class="app-header">
-
-                <div>
-
-                    <span class="greeting">
-                        WELCOME BACK
-                    </span>
-
-                    <h2 id="userName">
-                        Telegram User
-                    </h2>
-
-                </div>
-
-
-                <button
-                    id="profileButton"
-                    class="user-avatar"
-                >
-                    👤
-
-                    <span class="online-dot"></span>
-
-                </button>
-
-            </header>
-
-
-
-            <!-- BALANCE CARD -->
-
-            <div class="balance-card">
-
-                <div class="card-glow"></div>
-
-
-                <div class="balance-top">
-
-                    <span>
-                        PROMOTION CREDITS
-                    </span>
-
-                    <span class="credit-icon">
-                        ⚡
-                    </span>
-
-                </div>
-
-
-                <h1 id="userBalance">
-                    0
-                </h1>
-
-
-                <p>
-                    Available credits
-                </p>
-
-
-                <button
-                    id="startPromotionButton"
-                    class="card-button"
-                >
-                    Start Promotion
-
-                    <span>
-                        →
-                    </span>
-                </button>
-
-            </div>
-
-
-
-            <!-- STATS -->
-
-            <div class="stats-grid">
-
-                <div class="stat-card">
-
-                    <div class="stat-icon">
-                        🚀
-                    </div>
-
-                    <span>
-                        CAMPAIGNS
-                    </span>
-
-                    <h2 id="campaignCount">
-                        0
-                    </h2>
-
-                    <small>
-                        Total campaigns
-                    </small>
-
-                </div>
-
-
-                <div class="stat-card">
-
-                    <div class="stat-icon">
-                        👥
-                    </div>
-
-                    <span>
-                        TOTAL REACH
-                    </span>
-
-                    <h2 id="totalReach">
-                        0
-                    </h2>
-
-                    <small>
-                        People reached
-                    </small>
-
-                </div>
-
-            </div>
-
-
-
-            <!-- QUICK ACTION -->
-
-            <div class="section-title">
-
-                <div>
-
-                    <span>
-                        QUICK ACTION
-                    </span>
-
-                    <h3>
-                        Start growing
-                    </h3>
-
-                </div>
-
-            </div>
-
-
-            <button
-                class="promote-action"
-                id="quickPromoteButton"
-            >
-
-                <div class="action-icon">
-                    📢
-                </div>
-
-
-                <div class="action-text">
-
-                    <strong>
-                        Promote a Community
-                    </strong>
-
-                    <span>
-                        Submit your Telegram link
-                    </span>
-
-                </div>
-
-
-                <span class="action-arrow">
-                    →
-                </span>
-
-            </button>
-
-
-
-            <!-- RECENT CAMPAIGNS -->
-
-            <div class="section-title">
-
-                <div>
-
-                    <span>
-                        ACTIVITY
-                    </span>
-
-                    <h3>
-                        Recent Campaigns
-                    </h3>
-
-                </div>
-
-
-                <button
-                    id="viewCampaignsButton"
-                >
-                    View all
-                </button>
-
-            </div>
-
-
-            <div
-                id="recentCampaigns"
-                class="empty-card"
-            >
-
-                <div class="empty-icon">
-                    📭
-                </div>
-
-                <strong>
-                    No campaigns yet
-                </strong>
-
-                <span>
-                    Start your first promotion campaign
-                </span>
-
-            </div>
-
-        </section>
-
-
-
-        <!-- =========================
-             PROMOTE PAGE
-        ========================== -->
-
-        <section
-            id="promotePage"
-            class="page hidden"
-        >
-
-            <div class="page-heading">
-
-                <span>
-                    NEW CAMPAIGN
-                </span>
-
-                <h1>
-                    Create Promotion
-                </h1>
-
-                <p>
-                    Choose how you want to grow.
-                </p>
-
-            </div>
-
-
-            <div class="form-card">
-
-                <label>
-                    TELEGRAM LINK
-                </label>
-
-
-                <div class="input-box">
-
-                    <span>
-                        🔗
-                    </span>
-
-                    <input
-                        id="promotionLink"
-                        type="url"
-                        placeholder="https://t.me/yourcommunity"
-                    >
-
-                </div>
-
-
-
-                <label>
-                    PROMOTION TYPE
-                </label>
-
-
-                <div class="promotion-options">
-
-                    <button
-                        class="promotion-option selected"
-                        data-type="reach"
-                    >
-
-                        <span class="option-icon">
-                            📢
-                        </span>
-
-                        <strong>
-                            Link Reach
-                        </strong>
-
-                        <small>
-                            Promote your link
-                        </small>
-
-                    </button>
-
-
-                    <button
-                        class="promotion-option"
-                        data-type="joins"
-                    >
-
-                        <span class="option-icon">
-                            👥
-                        </span>
-
-                        <strong>
-                            Verified Joins
-                        </strong>
-
-                        <small>
-                            Track real joins
-                        </small>
-
-                    </button>
-
-                </div>
-
-
-
-                <label>
-                    TARGET AMOUNT
-                </label>
-
-
-                <div class="input-box">
-
-                    <span>
-                        🎯
-                    </span>
-
-                    <select id="promotionAmount">
-
-                        <option value="100">
-                            100 Reach
-                        </option>
-
-                        <option value="500">
-                            500 Reach
-                        </option>
-
-                        <option value="1000">
-                            1,000 Reach
-                        </option>
-
-                    </select>
-
-                </div>
-
-
-                <button
-                    id="createCampaignButton"
-                    class="main-button"
-                >
-                    Create Campaign
-
-                    <span>
-                        →
-                    </span>
-                </button>
-
-            </div>
-
-        </section>
-
-
-
-        <!-- =========================
-             CAMPAIGNS
-        ========================== -->
-
-        <section
-            id="campaignsPage"
-            class="page hidden"
-        >
-
-            <div class="page-heading">
-
-                <span>
-                    YOUR ACTIVITY
-                </span>
-
-                <h1>
-                    Campaigns
-                </h1>
-
-                <p>
-                    Track your promotion progress.
-                </p>
-
-            </div>
-
-
-            <div
-                id="campaignList"
-                class="empty-card"
-            >
-
-                <div class="empty-icon">
-                    📊
-                </div>
-
-                <strong>
-                    No campaigns
-                </strong>
-
-                <span>
-                    Your campaigns will appear here
-                </span>
-
-            </div>
-
-        </section>
-
-
-
-        <!-- =========================
-             PROFILE
-        ========================== -->
-
-        <section
-            id="profilePage"
-            class="page hidden"
-        >
-
-            <div class="profile-header">
-
-                <div class="large-avatar">
-                    👤
-                </div>
-
-
-                <h2 id="profileName">
-                    Telegram User
-                </h2>
-
-
-                <span id="profileUsername">
-                    @username
-                </span>
-
-            </div>
-
-
-
-            <div class="profile-options">
-
-                <button>
-
-                    <span>
-                        👥
-                    </span>
-
-                    <div>
-
-                        <strong>
-                            Referral Program
-                        </strong>
-
-                        <small>
-                            Invite friends and earn
-                        </small>
-
-                    </div>
-
-                    <b>
-                        →
-                    </b>
-
-                </button>
-
-
-                <button>
-
-                    <span>
-                        👑
-                    </span>
-
-                    <div>
-
-                        <strong>
-                            Premium
-                        </strong>
-
-                        <small>
-                            Upgrade your account
-                        </small>
-
-                    </div>
-
-                    <b>
-                        →
-                    </b>
-
-                </button>
-
-
-                <button>
-
-                    <span>
-                        💬
-                    </span>
-
-                    <div>
-
-                        <strong>
-                            Support
-                        </strong>
-
-                        <small>
-                            Get help
-                        </small>
-
-                    </div>
-
-                    <b>
-                        →
-                    </b>
-
-                </button>
-
-
-                <button
-                    id="logoutButton"
-                    class="logout-option"
-                >
-
-                    <span>
-                        🚪
-                    </span>
-
-                    <div>
-
-                        <strong>
-                            Log Out
-                        </strong>
-
-                        <small>
-                            Sign out of PromoHub
-                        </small>
-
-                    </div>
-
-                </button>
-
-            </div>
-
-        </section>
-
-
-
-        <!-- =========================
-             NAVIGATION
-        ========================== -->
-
-        <nav class="bottom-navigation">
-
-            <button
-                class="nav-button active"
-                data-page="dashboardPage"
-            >
-
-                <span>
-                    ⌂
-                </span>
-
-                <small>
-                    Home
-                </small>
-
-            </button>
-
-
-            <button
-                class="nav-button"
-                data-page="promotePage"
-            >
-
-                <span>
-                    ◉
-                </span>
-
-                <small>
-                    Promote
-                </small>
-
-            </button>
-
-
-            <button
-                class="nav-button"
-                data-page="campaignsPage"
-            >
-
-                <span>
-                    ◫
-                </span>
-
-                <small>
-                    Campaigns
-                </small>
-
-            </button>
-
-
-            <button
-                class="nav-button"
-                data-page="profilePage"
-            >
-
-                <span>
-                    ○
-                </span>
-
-                <small>
-                    Profile
-                </small>
-
-            </button>
-
-        </nav>
-
-    </main>
-
-
-
-    <!-- =========================
-         ACTION LOADER
-    ========================== -->
-
-    <div
-        id="actionLoader"
-        class="action-loader hidden"
-    >
-
-        <div class="mini-spinner"></div>
-
-        <strong id="actionLoaderText">
-            Processing...
-        </strong>
-
-    </div>
-
-
-    <script src="app.js"></script>
-
+    <section id="promotePage" class="page hidden">
+      <div class="page-heading">
+        <span class="eyebrow">NEW CAMPAIGN</span>
+        <h1>Promote.</h1>
+        <p>Choose where your Telegram link should be promoted.</p>
+      </div>
+
+      <div class="form-card">
+        <label for="promotionLink">TELEGRAM LINK</label>
+        <div class="input-box">
+          <span>🔗</span>
+          <input id="promotionLink" type="text" inputmode="url" autocomplete="off"
+                 placeholder="https://t.me/yourgroup">
+        </div>
+
+        <label>PROMOTION DESTINATION</label>
+        <div class="promotion-options">
+          <button type="button" class="promotion-option selected" data-type="users">
+            <span>👥</span><strong>Users</strong><small>Choose 15, 20 or 100 users</small>
+          </button>
+          <button type="button" class="promotion-option" data-type="groups">
+            <span>📢</span><strong>Group</strong><small>Post to @giveawayforall2</small>
+          </button>
+        </div>
+
+        <div id="usersTargetBox">
+          <label for="promotionAmount">NUMBER OF USERS</label>
+          <div class="input-box">
+            <span>🎯</span>
+            <select id="promotionAmount">
+              <option value="15">15 Users</option>
+              <option value="20">20 Users</option>
+              <option value="100">100 Users</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="groupTargetBox" class="hidden">
+          <label>GROUP DESTINATION</label>
+          <div class="destination-card">
+            <span>📢</span>
+            <div><strong>@giveawayforall2</strong><small>Your promotion will be posted here.</small></div>
+          </div>
+        </div>
+
+        <div class="cost-row">
+          <span>Campaign cost</span>
+          <strong><span id="campaignCost">15</span> credits</strong>
+        </div>
+
+        <button id="createCampaignButton" class="primary-button">
+          <span>Create Campaign</span><span>🚀</span>
+        </button>
+        <p id="formMessage" class="form-message"></p>
+      </div>
+    </section>
+
+    <section id="campaignsPage" class="page hidden">
+      <div class="page-heading">
+        <span class="eyebrow">YOUR ACTIVITY</span>
+        <h1>Campaigns.</h1>
+        <p>View campaigns created on this device.</p>
+      </div>
+      <div id="campaignList" class="campaign-container"></div>
+    </section>
+
+    <section id="profilePage" class="page hidden">
+      <div class="profile-header">
+        <div class="large-avatar">👤</div>
+        <h2 id="profileName">Telegram User</h2>
+        <span id="profileUsername">Telegram Account</span>
+      </div>
+      <div class="profile-options">
+        <div class="profile-row">
+          <span>💎</span><div><strong>Promotion Credits</strong><small id="profileCredits">100 credits</small></div>
+        </div>
+        <button id="logoutButton" class="profile-row">
+          <span>🚪</span><div><strong>Log Out</strong><small>Close this local session</small></div><b>›</b>
+        </button>
+      </div>
+    </section>
+
+    <nav class="bottom-navigation">
+      <button class="nav-button active" data-page="dashboardPage"><span>🏠</span><small>Home</small></button>
+      <button class="nav-button" data-page="promotePage"><span>🚀</span><small>Promote</small></button>
+      <button class="nav-button" data-page="campaignsPage"><span>📊</span><small>Campaigns</small></button>
+      <button class="nav-button" data-page="profilePage"><span>👤</span><small>Profile</small></button>
+    </nav>
+  </main>
+
+  <div id="actionLoader" class="action-loader hidden">
+    <div class="mini-spinner"></div>
+    <strong id="actionLoaderText">Processing...</strong>
+  </div>
+
+  <script src="./app.js"></script>
 </body>
-
 </html>
