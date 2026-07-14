@@ -1,1940 +1,1004 @@
-"use strict";
+// =========================
+// TELEGRAM MINI APP
+// =========================
 
-/*
-==========================================
- PromoHub v3
- Part 1/4
-==========================================
-*/
-
-
-/* ==========================================
-   CONFIG
-========================================== */
-
-const API_BASE_URL =
-"https://promohub-backend-fkvo.onrender.com";
-
-
-/* ==========================================
-   TELEGRAM
-========================================== */
-
-const tg =
-window.Telegram?.WebApp || null;
-
+const tg = window.Telegram?.WebApp;
 
 if (tg) {
-
     tg.ready();
-
     tg.expand();
-
 }
 
 
-/* ==========================================
-   HELPERS
-========================================== */
+// =========================
+// ELEMENTS
+// =========================
 
-const $ = id =>
-document.getElementById(id);
+const loader = document.getElementById("loader");
+const loadingText = document.getElementById("loadingText");
 
+const loginPage = document.getElementById("loginPage");
+const app = document.getElementById("app");
 
-const $$ = selector =>
-document.querySelectorAll(selector);
+const loginButton = document.getElementById("loginButton");
+const logoutButton = document.getElementById("logoutButton");
 
+const actionLoader = document.getElementById("actionLoader");
+const actionLoaderText = document.getElementById("actionLoaderText");
 
-const sleep = ms =>
-new Promise(resolve => setTimeout(resolve, ms));
+const userName = document.getElementById("userName");
+const profileName = document.getElementById("profileName");
+const profileUsername = document.getElementById("profileUsername");
 
+const profileButton = document.getElementById("profileButton");
 
+const startPromotionButton = document.getElementById(
+    "startPromotionButton"
+);
 
-/* ==========================================
-   STORAGE
-========================================== */
+const quickPromoteButton = document.getElementById(
+    "quickPromoteButton"
+);
 
+const viewCampaignsButton = document.getElementById(
+    "viewCampaignsButton"
+);
 
-let user =
-JSON.parse(
-localStorage.getItem("promohub_user")
-)
-||
-null;
+const createCampaignButton = document.getElementById(
+    "createCampaignButton"
+);
 
+const promotionLink = document.getElementById("promotionLink");
+const promotionAmount = document.getElementById("promotionAmount");
 
-let campaigns =
-JSON.parse(
-localStorage.getItem("promohub_campaigns")
-)
-||
-[];
 
+// =========================
+// APP DATA
+// =========================
 
-let credits =
-Number(
-localStorage.getItem("promohub_credits")
-)
-||
-100;
+let currentUser = null;
+let promotionType = "reach";
 
+let campaigns = [];
 
 
-function saveData(){
+// =========================
+// LOADING SCREEN
+// =========================
 
-    localStorage.setItem(
-        "promohub_campaigns",
-        JSON.stringify(campaigns)
-    );
+function wait(ms) {
 
+    return new Promise(resolve => {
 
-    localStorage.setItem(
-        "promohub_credits",
-        credits
-    );
-
-}
-
-
-
-/* ==========================================
-   ELEMENTS
-========================================== */
-
-
-const loader =
-$("loader");
-
-
-const loginPage =
-$("loginPage");
-
-
-const app =
-$("app");
-
-
-const loginButton =
-$("loginButton");
-
-
-
-/* ==========================================
-   LOADER
-========================================== */
-
-
-function hideLoader(){
-
-    if(loader){
-
-        loader.classList.add(
-            "hidden"
-        );
-
-    }
-
-}
-
-
-
-function showActionLoader(text="Processing..."){
-
-    const box =
-    $("actionLoader");
-
-
-    const label =
-    $("actionLoaderText");
-
-
-    if(label)
-    label.innerText = text;
-
-
-    if(box)
-    box.classList.remove(
-        "hidden"
-    );
-
-}
-
-
-
-function hideActionLoader(){
-
-    const box =
-    $("actionLoader");
-
-
-    if(box)
-    box.classList.add(
-        "hidden"
-    );
-
-}
-
-
-
-/* ==========================================
-   PAGE SYSTEM
-========================================== */
-
-
-function showPage(pageId){
-
-
-    $$(".page")
-    .forEach(page=>{
-
-        page.classList.add(
-            "hidden"
-        );
+        setTimeout(resolve, ms);
 
     });
 
-
-
-    const page =
-    $(pageId);
-
-
-    if(page){
-
-        page.classList.remove(
-            "hidden"
-        );
-
-    }
-
-
-
-    $$(".nav-button")
-    .forEach(btn=>{
-
-
-        btn.classList.remove(
-            "active"
-        );
-
-
-        if(btn.dataset.page === pageId){
-
-            btn.classList.add(
-                "active"
-            );
-
-        }
-
-
-    });
-
-
 }
 
 
+async function startApp() {
 
-/* ==========================================
-   NAVIGATION BUTTONS
-========================================== */
+    loadingText.textContent =
+        "Connecting to Telegram...";
 
+    await wait(900);
 
-$$(".nav-button")
-.forEach(button=>{
 
+    loadingText.textContent =
+        "Loading account...";
 
-    button.onclick = ()=>{
-
-
-        showPage(
-            button.dataset.page
-        );
-
-
-    };
-
-
-});
-
-
-
-/* ==========================================
-   TELEGRAM LOGIN
-========================================== */
-
-
-function loadTelegramUser(){
-
-
-    if(tg && tg.initDataUnsafe?.user){
-
-
-        const tgUser =
-        tg.initDataUnsafe.user;
-
-
-
-        user = {
-
-            id:
-            tgUser.id,
-
-            first_name:
-            tgUser.first_name
-            ||
-            "Telegram User",
-
-
-            username:
-            tgUser.username
-            ||
-            ""
-
-        };
-
-
-    }
-
-
-    else {
-
-
-        user = {
-
-            id:
-            Date.now(),
-
-
-            first_name:
-            "Guest",
-
-
-            username:
-            "guest"
-
-
-        };
-
-
-    }
-
-
-
-    localStorage.setItem(
-        "promohub_user",
-        JSON.stringify(user)
-    );
-
-}
-
-
-
-/* ==========================================
-   UPDATE USER UI
-========================================== */
-
-
-function updateUserUI(){
-
-
-    if(!user)
-    return;
-
-
-
-    if($("userName"))
-
-    $("userName").innerText =
-    user.first_name;
-
-
-
-    if($("profileName"))
-
-    $("profileName").innerText =
-    user.first_name;
-
-
-
-    if($("profileUsername"))
-
-    $("profileUsername").innerText =
-    user.username
-    ?
-    "@"+user.username
-    :
-    "@guest";
-
-
-
-    if($("creditBalance"))
-
-    $("creditBalance").innerText =
-    credits;
-
-
-
-    if($("profileCredits"))
-
-    $("profileCredits").innerText =
-    credits;
-
-
-
-    if($("profileCreditsText"))
-
-    $("profileCreditsText").innerText =
-    credits+" Credits";
-
-
-}
-
-
-
-/* ==========================================
-   LOGIN BUTTON
-========================================== */
-
-
-if(loginButton){
-
-
-loginButton.onclick = async ()=>{
-
-
-    showActionLoader(
-        "Logging in..."
-    );
-
-
-    await sleep(500);
-
+    await wait(800);
 
 
     loadTelegramUser();
 
-
-    updateUserUI();
-
+    loadCampaigns();
 
 
-    loginPage.classList.add(
-        "hidden"
-    );
+    loadingText.textContent =
+        "Ready";
+
+    await wait(500);
 
 
-    app.classList.remove(
-        "hidden"
-    );
+    loader.classList.add("hide-loader");
+
+    await wait(500);
 
 
-
-    refreshDashboard();
-
+    loader.classList.add("hidden");
 
 
-    hideActionLoader();
-
-
-
-};
-
+    checkLogin();
 
 }
 
 
-
-/* ==========================================
-   START PROMOTION BUTTONS
-========================================== */
+startApp();
 
 
-const startPromotionButton =
-$("startPromotionButton");
+// =========================
+// TELEGRAM USER
+// =========================
+
+function loadTelegramUser() {
+
+    try {
+
+        if (
+            tg &&
+            tg.initDataUnsafe &&
+            tg.initDataUnsafe.user
+        ) {
+
+            const telegramUser =
+                tg.initDataUnsafe.user;
 
 
-const quickPromoteButton =
-$("quickPromoteButton");
+            currentUser = {
+
+                id: telegramUser.id,
+
+                firstName:
+                    telegramUser.first_name ||
+                    "Telegram User",
+
+                lastName:
+                    telegramUser.last_name ||
+                    "",
+
+                username:
+                    telegramUser.username ||
+                    ""
+
+            };
 
 
+            localStorage.setItem(
+                "promoUser",
+                JSON.stringify(currentUser)
+            );
 
-if(startPromotionButton){
-
-startPromotionButton.onclick = ()=>{
-
-    showPage(
-        "promotePage"
-    );
-
-};
-
-}
-
-
-
-if(quickPromoteButton){
-
-quickPromoteButton.onclick = ()=>{
-
-    showPage(
-        "promotePage"
-    );
-
-};
-
-}
-/*
-==========================================
- PromoHub v3
- Part 2/4
-==========================================
-*/
-
-
-/* ==========================================
-   DASHBOARD
-========================================== */
-
-
-function refreshDashboard(){
-
-
-    const campaignCount =
-    $("campaignCount");
-
-
-    const totalReach =
-    $("totalReach");
-
-
-    const profileCampaigns =
-    $("profileCampaigns");
-
-
-    if(campaignCount){
-
-        campaignCount.innerText =
-        campaigns.length;
+        }
 
     }
 
+    catch (error) {
+
+        console.log(
+            "Telegram user error:",
+            error
+        );
+
+    }
+
+}
 
 
-    let reach = 0;
+// =========================
+// CHECK LOGIN
+// =========================
+
+function checkLogin() {
+
+    const savedUser =
+        localStorage.getItem("promoUser");
 
 
-    campaigns.forEach(c=>{
+    if (savedUser) {
 
-        reach +=
-        Number(c.amount || 0);
+        try {
+
+            currentUser =
+                JSON.parse(savedUser);
+
+
+            openApp();
+
+        }
+
+        catch (error) {
+
+            localStorage.removeItem(
+                "promoUser"
+            );
+
+
+            showLogin();
+
+        }
+
+    }
+
+    else {
+
+        showLogin();
+
+    }
+
+}
+
+
+// =========================
+// SHOW LOGIN
+// =========================
+
+function showLogin() {
+
+    app.classList.add("hidden");
+
+    loginPage.classList.remove("hidden");
+
+}
+
+
+// =========================
+// OPEN APP
+// =========================
+
+function openApp() {
+
+    loginPage.classList.add("hidden");
+
+    app.classList.remove("hidden");
+
+
+    updateUserUI();
+
+    updateCampaignUI();
+
+    openPage("dashboardPage");
+
+}
+
+
+// =========================
+// LOGIN
+// =========================
+
+loginButton.addEventListener(
+    "click",
+    async function () {
+
+        showActionLoader(
+            "Connecting your account..."
+        );
+
+
+        await wait(1000);
+
+
+        loadTelegramUser();
+
+
+        if (!currentUser) {
+
+            hideActionLoader();
+
+
+            alert(
+                "Please open PromoHub inside Telegram."
+            );
+
+
+            return;
+
+        }
+
+
+        localStorage.setItem(
+            "promoUser",
+            JSON.stringify(currentUser)
+        );
+
+
+        await wait(500);
+
+
+        hideActionLoader();
+
+        openApp();
+
+    }
+);
+
+
+// =========================
+// LOGOUT
+// =========================
+
+logoutButton.addEventListener(
+    "click",
+    async function () {
+
+        showActionLoader(
+            "Logging out..."
+        );
+
+
+        await wait(800);
+
+
+        localStorage.removeItem(
+            "promoUser"
+        );
+
+
+        currentUser = null;
+
+
+        hideActionLoader();
+
+        showLogin();
+
+    }
+);
+
+
+// =========================
+// USER UI
+// =========================
+
+function updateUserUI() {
+
+    if (!currentUser) {
+        return;
+    }
+
+
+    const fullName = (
+
+        currentUser.firstName +
+
+        " " +
+
+        currentUser.lastName
+
+    ).trim();
+
+
+    userName.textContent =
+        fullName;
+
+
+    profileName.textContent =
+        fullName;
+
+
+    if (currentUser.username) {
+
+        profileUsername.textContent =
+            "@" + currentUser.username;
+
+    }
+
+    else {
+
+        profileUsername.textContent =
+            "Telegram ID: " +
+            currentUser.id;
+
+    }
+
+}
+
+
+// =========================
+// PAGE NAVIGATION
+// =========================
+
+function openPage(pageId) {
+
+    const pages =
+        document.querySelectorAll(".page");
+
+
+    pages.forEach(page => {
+
+        page.classList.add("hidden");
 
     });
 
 
+    const selectedPage =
+        document.getElementById(pageId);
 
-    if(totalReach){
 
-        totalReach.innerText =
+    if (selectedPage) {
+
+        selectedPage.classList.remove(
+            "hidden"
+        );
+
+    }
+
+
+    const navButtons =
+        document.querySelectorAll(
+            ".nav-button"
+        );
+
+
+    navButtons.forEach(button => {
+
+        button.classList.remove("active");
+
+
+        if (
+            button.dataset.page === pageId
+        ) {
+
+            button.classList.add("active");
+
+        }
+
+    });
+
+
+    window.scrollTo({
+
+        top: 0,
+
+        behavior: "smooth"
+
+    });
+
+}
+
+
+document
+    .querySelectorAll(".nav-button")
+    .forEach(button => {
+
+        button.addEventListener(
+            "click",
+            function () {
+
+                openPage(
+                    this.dataset.page
+                );
+
+            }
+        );
+
+    });
+
+
+// =========================
+// QUICK NAVIGATION
+// =========================
+
+profileButton.addEventListener(
+    "click",
+    function () {
+
+        openPage("profilePage");
+
+    }
+);
+
+
+startPromotionButton.addEventListener(
+    "click",
+    function () {
+
+        openPage("promotePage");
+
+    }
+);
+
+
+quickPromoteButton.addEventListener(
+    "click",
+    function () {
+
+        openPage("promotePage");
+
+    }
+);
+
+
+viewCampaignsButton.addEventListener(
+    "click",
+    function () {
+
+        openPage("campaignsPage");
+
+    }
+);
+
+
+// =========================
+// PROMOTION TYPE
+// =========================
+
+const promotionOptions =
+    document.querySelectorAll(
+        ".promotion-option"
+    );
+
+
+promotionOptions.forEach(option => {
+
+    option.addEventListener(
+        "click",
+        function () {
+
+            promotionOptions.forEach(
+                item => {
+
+                    item.classList.remove(
+                        "selected"
+                    );
+
+                }
+            );
+
+
+            this.classList.add(
+                "selected"
+            );
+
+
+            promotionType =
+                this.dataset.type;
+
+        }
+    );
+
+});
+
+
+// =========================
+// CREATE CAMPAIGN
+// =========================
+
+createCampaignButton.addEventListener(
+    "click",
+    async function () {
+
+        const link =
+            promotionLink.value.trim();
+
+
+        const amount =
+            parseInt(
+                promotionAmount.value
+            );
+
+
+        if (!link) {
+
+            alert(
+                "Please enter your Telegram link."
+            );
+
+            return;
+
+        }
+
+
+        if (
+            !link.startsWith(
+                "https://t.me/"
+            )
+        ) {
+
+            alert(
+                "Please enter a valid Telegram link."
+            );
+
+            return;
+
+        }
+
+
+        showActionLoader(
+            "Creating campaign..."
+        );
+
+
+        await wait(1200);
+
+
+        const campaign = {
+
+            id:
+                Date.now(),
+
+            link:
+                link,
+
+            type:
+                promotionType,
+
+            amount:
+                amount,
+
+            delivered:
+                0,
+
+            status:
+                "Active",
+
+            created:
+                new Date().toISOString()
+
+        };
+
+
+        campaigns.unshift(
+            campaign
+        );
+
+
+        saveCampaigns();
+
+
+        promotionLink.value = "";
+
+
+        hideActionLoader();
+
+
+        updateCampaignUI();
+
+
+        openPage(
+            "campaignsPage"
+        );
+
+    }
+);
+
+
+// =========================
+// SAVE CAMPAIGNS
+// =========================
+
+function saveCampaigns() {
+
+    if (!currentUser) {
+        return;
+    }
+
+
+    localStorage.setItem(
+
+        "promoCampaigns_" +
+        currentUser.id,
+
+        JSON.stringify(campaigns)
+
+    );
+
+}
+
+
+// =========================
+// LOAD CAMPAIGNS
+// =========================
+
+function loadCampaigns() {
+
+    const savedUser =
+        localStorage.getItem(
+            "promoUser"
+        );
+
+
+    if (!savedUser) {
+
+        campaigns = [];
+
+        return;
+
+    }
+
+
+    try {
+
+        const user =
+            JSON.parse(savedUser);
+
+
+        const savedCampaigns =
+            localStorage.getItem(
+
+                "promoCampaigns_" +
+                user.id
+
+            );
+
+
+        if (savedCampaigns) {
+
+            campaigns =
+                JSON.parse(
+                    savedCampaigns
+                );
+
+        }
+
+        else {
+
+            campaigns = [];
+
+        }
+
+    }
+
+    catch (error) {
+
+        campaigns = [];
+
+    }
+
+}
+
+
+// =========================
+// CAMPAIGN UI
+// =========================
+
+function updateCampaignUI() {
+
+    loadCampaigns();
+
+
+    const campaignCount =
+        document.getElementById(
+            "campaignCount"
+        );
+
+
+    const totalReach =
+        document.getElementById(
+            "totalReach"
+        );
+
+
+    const campaignList =
+        document.getElementById(
+            "campaignList"
+        );
+
+
+    const recentCampaigns =
+        document.getElementById(
+            "recentCampaigns"
+        );
+
+
+    campaignCount.textContent =
+        campaigns.length;
+
+
+    const reach =
+        campaigns.reduce(
+
+            (total, campaign) => {
+
+                return total +
+                    Number(
+                        campaign.delivered || 0
+                    );
+
+            },
+
+            0
+
+        );
+
+
+    totalReach.textContent =
         reach;
 
+
+    if (campaigns.length === 0) {
+
+        campaignList.innerHTML = `
+
+            <div class="empty-icon">
+                📊
+            </div>
+
+            <strong>
+                No campaigns
+            </strong>
+
+            <span>
+                Your campaigns will appear here
+            </span>
+
+        `;
+
+
+        recentCampaigns.innerHTML = `
+
+            <div class="empty-icon">
+                📭
+            </div>
+
+            <strong>
+                No campaigns yet
+            </strong>
+
+            <span>
+                Start your first promotion campaign
+            </span>
+
+        `;
+
+
+        return;
+
     }
 
 
-
-    if(profileCampaigns){
-
-        profileCampaigns.innerText =
-        campaigns.length +
-        " Campaigns";
-
-    }
+    campaignList.innerHTML = "";
 
 
+    campaigns.forEach(campaign => {
 
-    if($("profileCredits")){
-
-        $("profileCredits").innerText =
-        credits;
-
-    }
-
+        const card =
+            createCampaignCard(
+                campaign
+            );
 
 
-    if($("creditBalance")){
+        campaignList.appendChild(
+            card
+        );
 
-        $("creditBalance").innerText =
-        credits;
-
-    }
-
+    });
 
 
-}
+    recentCampaigns.innerHTML = "";
 
 
+    campaigns
+        .slice(0, 2)
+        .forEach(campaign => {
 
-/* ==========================================
-   CREATE CAMPAIGN
-========================================== */
-
-
-const createCampaignButton =
-$("createCampaignButton");
-
-
-const promotionLink =
-$("promotionLink");
+            const card =
+                createCampaignCard(
+                    campaign
+                );
 
 
-const promotionAmount =
-$("promotionAmount");
+            recentCampaigns.appendChild(
+                card
+            );
 
-
-
-if(createCampaignButton){
-
-
-createCampaignButton.onclick =
-async ()=>{
-
-
-showActionLoader(
-"Creating campaign..."
-);
-
-
-
-try{
-
-
-let link =
-promotionLink.value.trim();
-
-
-
-if(!link){
-
-throw new Error(
-"Please enter a Telegram link."
-);
+        });
 
 }
 
 
+// =========================
+// CREATE CAMPAIGN CARD
+// =========================
 
-if(!link.includes("t.me")){
+function createCampaignCard(campaign) {
 
-throw new Error(
-"Invalid Telegram link."
-);
+    const card =
+        document.createElement("div");
+
+
+    card.className =
+        "campaign-card";
+
+
+    const progress = Math.min(
+
+        100,
+
+        Math.round(
+
+            (
+                Number(
+                    campaign.delivered
+                )
+                /
+
+                Number(
+                    campaign.amount
+                )
+
+            ) * 100
+
+        )
+
+    );
+
+
+    card.innerHTML = `
+
+        <div class="campaign-top">
+
+            <div>
+
+                <strong>
+                    ${
+                        campaign.type === "joins"
+                        ? "👥 Verified Joins"
+                        : "📢 Link Reach"
+                    }
+                </strong>
+
+                <span>
+                    ${campaign.link}
+                </span>
+
+            </div>
+
+
+            <b>
+                ${campaign.status}
+            </b>
+
+        </div>
+
+
+        <div class="campaign-progress">
+
+            <div class="progress-info">
+
+                <span>
+                    Progress
+                </span>
+
+                <strong>
+                    ${campaign.delivered}
+                    /
+                    ${campaign.amount}
+                </strong>
+
+            </div>
+
+
+            <div class="progress-bar">
+
+                <div
+                    class="progress-fill"
+                    style="width: ${progress}%"
+                ></div>
+
+            </div>
+
+        </div>
+
+    `;
+
+
+    return card;
 
 }
 
 
+// =========================
+// ACTION LOADER
+// =========================
+
+function showActionLoader(text) {
+
+    actionLoaderText.textContent =
+        text || "Processing...";
 
 
-let selected =
-document.querySelector(
-".promotion-option.selected"
-);
-
-
-
-let type =
-selected
-?
-selected.dataset.type
-:
-"users";
-
-
-
-
-let amount =
-type === "users"
-?
-Number(
-promotionAmount.value
-)
-:
-0;
-
-
-
-
-if(credits < amount){
-
-throw new Error(
-"Not enough credits."
-);
+    actionLoader.classList.remove(
+        "hidden"
+    );
 
 }
 
 
+function hideActionLoader() {
 
-
-let campaign = {
-
-
-id:
-Date.now(),
-
-
-link:
-link,
-
-
-type:
-type,
-
-
-amount:
-amount,
-
-
-status:
-"Pending",
-
-
-created:
-new Date()
-.toLocaleString(),
-
-
-reached:
-0
-
-
-};
-
-
-
-
-
-campaigns.unshift(
-campaign
-);
-
-
-
-credits -= amount;
-
-
-
-saveData();
-
-
-
-refreshDashboard();
-
-
-renderRecentCampaigns();
-
-
-renderCampaignHistory();
-
-
-
-promotionLink.value = "";
-
-
-
-showSuccess();
-
-
-
-showToast(
-"Campaign created!"
-);
-
-
-
-showPage(
-"campaignsPage"
-);
-
-
+    actionLoader.classList.add(
+        "hidden"
+    );
 
 }
-
-
-
-catch(error){
-
-
-console.error(error);
-
-
-
-showToast(
-error.message,
-"error"
-);
-
-
-
-}
-
-
-
-finally{
-
-
-hideActionLoader();
-
-
-}
-
-
-
-};
-
-
-}
-
-
-
-/* ==========================================
-   PROMOTION TYPE SWITCH
-========================================== */
-
-
-$$(".promotion-option")
-.forEach(button=>{
-
-
-button.onclick = ()=>{
-
-
-$$(".promotion-option")
-.forEach(btn=>{
-
-
-btn.classList.remove(
-"selected"
-);
-
-
-});
-
-
-
-button.classList.add(
-"selected"
-);
-
-
-
-if(button.dataset.type === "users"){
-
-
-$("usersTargetBox")
-?.classList.remove(
-"hidden"
-);
-
-
-
-$("groupTargetBox")
-?.classList.add(
-"hidden"
-);
-
-
-
-}
-
-
-
-else {
-
-
-
-$("usersTargetBox")
-?.classList.add(
-"hidden"
-);
-
-
-
-$("groupTargetBox")
-?.classList.remove(
-"hidden"
-);
-
-
-
-}
-
-
-
-};
-
-
-});
-
-
-
-/* ==========================================
-   COST UPDATE
-========================================== */
-
-
-if(promotionAmount){
-
-
-promotionAmount.onchange = ()=>{
-
-
-let cost =
-Number(
-promotionAmount.value
-);
-
-
-
-if($("campaignCost")){
-
-
-$("campaignCost")
-.innerText =
-cost;
-
-
-}
-
-
-
-};
-
-
-
-}
-
-
-
-/* ==========================================
-   RECENT CAMPAIGNS
-========================================== */
-
-
-function renderRecentCampaigns(){
-
-
-const box =
-$("recentCampaigns");
-
-
-if(!box)
-return;
-
-
-
-if(campaigns.length === 0){
-
-
-box.innerHTML = `
-
-<div class="empty-card">
-
-🚀
-
-<p>
-No campaigns yet.
-</p>
-
-</div>
-
-`;
-
-return;
-
-
-}
-
-
-
-
-box.innerHTML =
-campaigns
-.slice(0,3)
-.map(c=>{
-
-
-return `
-
-<div class="campaign-card">
-
-
-<div>
-
-<strong>
-${c.type.toUpperCase()}
-</strong>
-
-
-<p>
-${c.link}
-</p>
-
-
-</div>
-
-
-<span>
-
-${c.status}
-
-</span>
-
-
-</div>
-
-`;
-
-})
-.join("");
-
-
-
-}
-
-
-
-/* ==========================================
-   CAMPAIGN HISTORY
-========================================== */
-
-
-function renderCampaignHistory(){
-
-
-const box =
-$("campaignList");
-
-
-if(!box)
-return;
-
-
-
-if(campaigns.length === 0){
-
-
-box.innerHTML = `
-
-<div class="empty-card">
-
-📊
-
-<p>
-No campaigns yet.
-</p>
-
-</div>
-
-`;
-
-return;
-
-}
-
-
-
-
-box.innerHTML =
-campaigns.map(c=>{
-
-
-return `
-
-<div class="campaign-card">
-
-
-<h3>
-${c.type === "users"
-?
-"👥 Users Promotion"
-:
-"📢 Group Promotion"
-}
-</h3>
-
-
-
-<p>
-🔗 ${c.link}
-</p>
-
-
-<p>
-🎯 Target:
-${c.amount}
-</p>
-
-
-
-<small>
-${c.created}
-</small>
-
-
-<span>
-${c.status}
-</span>
-
-
-</div>
-
-
-`;
-
-})
-.join("");
-
-
-
-}
-/*
-==========================================
- PromoHub v3
- Part 3/4
-==========================================
-*/
-
-
-/* ==========================================
-   PREMIUM
-========================================== */
-
-
-const upgradeButton =
-$("upgradeButton");
-
-
-if(upgradeButton){
-
-
-upgradeButton.onclick = ()=>{
-
-
-showToast(
-"Premium upgrade coming soon!"
-);
-
-
-};
-
-
-
-}
-
-
-
-/* ==========================================
-   PROFILE
-========================================== */
-
-
-function loadProfile(){
-
-
-if(!user)
-return;
-
-
-
-if($("profileName")){
-
-
-$("profileName").innerText =
-user.first_name;
-
-
-}
-
-
-
-if($("profileUsername")){
-
-
-$("profileUsername").innerText =
-user.username
-?
-"@" + user.username
-:
-"@guest";
-
-
-}
-
-
-
-if($("profileCreditsText")){
-
-
-$("profileCreditsText").innerText =
-credits + " Credits";
-
-
-}
-
-
-
-if($("profileCampaigns")){
-
-
-$("profileCampaigns").innerText =
-campaigns.length +
-" Campaigns";
-
-
-}
-
-
-
-}
-
-
-
-/* ==========================================
-   LOGOUT
-========================================== */
-
-
-const logoutButton =
-$("logoutButton");
-
-
-
-if(logoutButton){
-
-
-logoutButton.onclick = ()=>{
-
-
-localStorage.removeItem(
-"promohub_user"
-);
-
-
-
-localStorage.removeItem(
-"promohub_campaigns"
-);
-
-
-
-localStorage.removeItem(
-"promohub_credits"
-);
-
-
-
-user = null;
-
-
-campaigns = [];
-
-
-credits = 100;
-
-
-
-app.classList.add(
-"hidden"
-);
-
-
-
-loginPage.classList.remove(
-"hidden"
-);
-
-
-
-showToast(
-"Logged out"
-);
-
-
-
-};
-
-
-
-}
-
-
-
-/* ==========================================
-   VIEW ALL CAMPAIGNS
-========================================== */
-
-
-const viewCampaignsButton =
-$("viewCampaignsButton");
-
-
-
-if(viewCampaignsButton){
-
-
-viewCampaignsButton.onclick = ()=>{
-
-
-renderCampaignHistory();
-
-
-showPage(
-"campaignsPage"
-);
-
-
-
-};
-
-
-}
-
-
-
-/* ==========================================
-   HISTORY SHORTCUT
-========================================== */
-
-
-const historyShortcut =
-$("historyShortcut");
-
-
-
-if(historyShortcut){
-
-
-historyShortcut.onclick = ()=>{
-
-
-renderCampaignHistory();
-
-
-showPage(
-"campaignsPage"
-);
-
-
-
-};
-
-
-
-}
-
-
-
-/* ==========================================
-   CLOSE SUCCESS MODAL
-========================================== */
-
-
-const closeModal =
-$("closeModal");
-
-
-
-if(closeModal){
-
-
-closeModal.onclick = ()=>{
-
-
-$("successModal")
-.classList.add(
-"hidden"
-);
-
-
-
-};
-
-
-
-}
-
-
-
-/* ==========================================
-   CAMPAIGN API PLACEHOLDER
-========================================== */
-
-
-async function sendCampaignToServer(campaign){
-
-
-try{
-
-
-const response =
-await fetch(
-API_BASE_URL + "/campaign",
-{
-
-
-method:"POST",
-
-
-headers:{
-
-
-"Content-Type":
-"application/json"
-
-
-},
-
-
-body:
-JSON.stringify(
-campaign
-)
-
-
-}
-
-);
-
-
-
-return await response.json();
-
-
-
-}
-
-
-catch(error){
-
-
-console.error(
-"API Error:",
-error
-);
-
-
-return null;
-
-
-}
-
-
-
-}
-
-
-
-/* ==========================================
-   CREDIT SYSTEM
-========================================== */
-
-
-function addCredits(amount){
-
-
-credits += Number(amount);
-
-
-saveData();
-
-
-updateUserUI();
-
-
-refreshDashboard();
-
-
-
-}
-
-
-
-function removeCredits(amount){
-
-
-credits -= Number(amount);
-
-
-if(credits < 0){
-
-credits = 0;
-
-}
-
-
-
-saveData();
-
-
-updateUserUI();
-
-
-refreshDashboard();
-
-
-
-}
-
-
-
-/* ==========================================
-   CAMPAIGN STATUS
-========================================== */
-
-
-function updateCampaignStatus(
-id,
-status
-){
-
-
-
-let campaign =
-campaigns.find(
-c=>c.id === id
-);
-
-
-
-if(campaign){
-
-
-campaign.status =
-status;
-
-
-
-saveData();
-
-
-
-renderRecentCampaigns();
-
-
-renderCampaignHistory();
-
-
-
-}
-
-
-
-}
-
-
-
-/* ==========================================
-   INITIAL PAGE LOAD DATA
-========================================== */
-
-
-function loadAppData(){
-
-
-
-if(user){
-
-
-updateUserUI();
-
-
-loadProfile();
-
-
-refreshDashboard();
-
-
-renderRecentCampaigns();
-
-
-renderCampaignHistory();
-
-
-}
-
-
-
-}
-/*
-==========================================
- PromoHub v3
- Part 4/4
-==========================================
-*/
-
-
-/* ==========================================
-   TOAST SYSTEM
-========================================== */
-
-
-function showToast(
-message,
-type="success"
-){
-
-
-const container =
-$("toastContainer");
-
-
-
-if(!container)
-return;
-
-
-
-const toast =
-document.createElement(
-"div"
-);
-
-
-
-toast.className =
-"toast " + type;
-
-
-
-toast.innerText =
-message;
-
-
-
-container.appendChild(
-toast
-);
-
-
-
-setTimeout(()=>{
-
-
-toast.classList.add(
-"show"
-);
-
-
-
-},50);
-
-
-
-setTimeout(()=>{
-
-
-toast.classList.remove(
-"show"
-);
-
-
-
-setTimeout(()=>{
-
-
-toast.remove();
-
-
-
-},300);
-
-
-
-},3000);
-
-
-
-}
-
-
-
-/* ==========================================
-   SUCCESS MODAL
-========================================== */
-
-
-function showSuccess(){
-
-
-const modal =
-$("successModal");
-
-
-
-if(modal){
-
-
-modal.classList.remove(
-"hidden"
-);
-
-
-
-}
-
-
-
-}
-
-
-
-/* ==========================================
-   LOGIN CHECK
-========================================== */
-
-
-function checkLogin(){
-
-
-
-if(user){
-
-
-
-loginPage.classList.add(
-"hidden"
-);
-
-
-
-app.classList.remove(
-"hidden"
-);
-
-
-
-updateUserUI();
-
-
-loadProfile();
-
-
-refreshDashboard();
-
-
-renderRecentCampaigns();
-
-
-renderCampaignHistory();
-
-
-
-}
-
-
-else {
-
-
-
-loginPage.classList.remove(
-"hidden"
-);
-
-
-
-app.classList.add(
-"hidden"
-);
-
-
-
-}
-
-
-
-}
-
-
-
-/* ==========================================
-   LOADING SCREEN
-========================================== */
-
-
-async function startApp(){
-
-
-
-await sleep(
-1500
-);
-
-
-
-hideLoader();
-
-
-
-checkLogin();
-
-
-
-}
-
-
-
-/* ==========================================
-   TELEGRAM CLOSE HANDLER
-========================================== */
-
-
-if(tg){
-
-
-tg.onEvent(
-"viewportChanged",
-()=>{
-
-
-tg.expand();
-
-
-
-}
-
-);
-
-
-
-}
-
-
-
-/* ==========================================
-   UPDATE CAMPAIGN COST
-========================================== */
-
-
-const campaignAmount =
-$("promotionAmount");
-
-
-
-if(campaignAmount){
-
-
-
-campaignAmount.addEventListener(
-"change",
-()=>{
-
-
-if($("campaignCost")){
-
-
-$("campaignCost")
-.innerText =
-campaignAmount.value;
-
-
-}
-
-
-
-}
-
-);
-
-
-
-}
-
-
-
-/* ==========================================
-   AUTO VALIDATE LINK
-========================================== */
-
-
-if(promotionLink){
-
-
-
-promotionLink.addEventListener(
-"input",
-()=>{
-
-
-const message =
-$("formMessage");
-
-
-
-if(!message)
-return;
-
-
-
-if(
-promotionLink.value &&
-!promotionLink.value.includes("t.me")
-){
-
-
-message.innerText =
-"⚠️ Enter a valid Telegram link";
-
-
-message.style.color =
-"red";
-
-
-
-}
-
-
-
-else {
-
-
-
-message.innerText =
-"";
-
-
-}
-
-
-
-}
-
-);
-
-
-
-}
-
-
-
-/* ==========================================
-   SAVE BEFORE CLOSE
-========================================== */
-
-
-window.addEventListener(
-"beforeunload",
-()=>{
-
-
-saveData();
-
-
-
-});
-
-
-
-/* ==========================================
-   START APPLICATION
-========================================== */
-
-
-startApp();
